@@ -19,8 +19,9 @@ public class JwtTokenProvider {
     @Value("${jwt.secret}") 
     private String jwtSecret; 
 
-    // Token validity duration in milliseconds
-    private final long validityInMilliseconds = 30; // 1 hour
+    // Token validity duration in seconds
+    @Value("${jwt.token.validity-seconds}") 
+    private long validityInSeconds;
 
     // Your implementation of user details service
     private final DatabaseUserDetailsService userDetailsService;
@@ -31,7 +32,7 @@ public class JwtTokenProvider {
 
     public String createToken(String username) {
         Date now = new Date();
-        Date validity = new Date(now.getTime() + validityInMilliseconds);
+        Date validity = new Date(now.getTime() + validityInSeconds * 1000);
 
         return Jwts.builder()
                 .setSubject(username)
