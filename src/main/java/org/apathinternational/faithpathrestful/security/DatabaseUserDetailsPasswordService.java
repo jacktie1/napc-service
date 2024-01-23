@@ -3,7 +3,7 @@ package org.apathinternational.faithpathrestful.security;
 import java.util.ArrayList;
 
 import org.apathinternational.faithpathrestful.model.User;
-import org.apathinternational.faithpathrestful.repository.UserRepository;
+import org.apathinternational.faithpathrestful.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsPasswordService;
@@ -17,12 +17,17 @@ import jakarta.transaction.Transactional;
 class DatabaseUserDetailsPasswordService implements UserDetailsPasswordService {
 
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
 
     @Override
     public UserDetails updatePassword(UserDetails userDetails, String newPassword) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(userDetails.getUsername())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + userDetails.getUsername()));
+        User user = userService.getUserByUsername(userDetails.getUsername());
+
+        if(user == null)
+        {
+            throw new UsernameNotFoundException("User not found with username: " + userDetails.getUsername());
+        }
+
         
         user.setPassword(newPassword);
         

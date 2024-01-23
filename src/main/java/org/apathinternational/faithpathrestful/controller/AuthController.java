@@ -2,6 +2,7 @@ package org.apathinternational.faithpathrestful.controller;
 
 import org.apathinternational.faithpathrestful.security.DatabaseUserDetailsService;
 import org.apathinternational.faithpathrestful.security.JwtTokenProvider;
+import org.apathinternational.faithpathrestful.service.UserService;
 import org.apathinternational.faithpathrestful.jsonmodel.LoginErrorResponse;
 import org.apathinternational.faithpathrestful.jsonmodel.LoginSuccessResponse;
 import org.apathinternational.faithpathrestful.model.User;
@@ -28,7 +29,7 @@ public class AuthController {
     private AuthenticationManager authenticationManager;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -66,6 +67,6 @@ public class AuthController {
         encrypted_user.setUsername(request.getUsername());
         encrypted_user.setPassword(passwordEncoder.encode(request.getPassword()));
         encrypted_user.setDisabled(false);
-        userRepository.save(encrypted_user);
+        userService.createUser(encrypted_user);
     }
 }
