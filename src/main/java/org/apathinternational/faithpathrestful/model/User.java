@@ -5,9 +5,16 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+
 import jakarta.persistence.Column;
 
 @Entity
+@DynamicInsert
+@DynamicUpdate
 @Table(name = "users")
 public class User {
 
@@ -23,6 +30,7 @@ public class User {
     private String password;
 
     @Column(name = "disabled", nullable = false)
+    @ColumnDefault("false") // "false" is the default value for "disabled
     private Boolean disabled;
 
     // Constructors, getters, and setters
@@ -65,8 +73,16 @@ public class User {
         return disabled;
     }
 
+    public void setUsername(String username) {
+    	this.username = username;
+    }
+
     public void setPassword(String password) {
     	this.password = password;
+    }
+
+    public void setDisabled(Boolean disabled) {
+    	this.disabled = disabled;
     }
 
     // toString, hashCode, equals...

@@ -62,7 +62,10 @@ public class AuthController {
     @PostMapping("/signup")
     @ResponseStatus(code = HttpStatus.CREATED)
     public void register(@RequestBody User request) {
-        User encrypted_user = new User(request.getUsername(), passwordEncoder.encode(request.getPassword()));
+        User encrypted_user = new User();
+        encrypted_user.setUsername(request.getUsername());
+        encrypted_user.setPassword(passwordEncoder.encode(request.getPassword()));
+        encrypted_user.setDisabled(false);
         userRepository.save(encrypted_user);
     }
 }
