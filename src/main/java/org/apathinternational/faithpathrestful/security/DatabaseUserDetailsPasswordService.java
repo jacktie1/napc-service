@@ -2,8 +2,6 @@ package org.apathinternational.faithpathrestful.security;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apathinternational.faithpathrestful.model.Role;
 import org.apathinternational.faithpathrestful.model.User;

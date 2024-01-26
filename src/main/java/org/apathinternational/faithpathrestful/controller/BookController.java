@@ -1,9 +1,7 @@
 package org.apathinternational.faithpathrestful.controller;
 
 import org.apathinternational.faithpathrestful.model.Book;
-import org.apathinternational.faithpathrestful.model.User;
 import org.apathinternational.faithpathrestful.service.BookService;
-import org.apathinternational.faithpathrestful.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -16,9 +14,6 @@ public class BookController {
 
     @Autowired
     private BookService bookService;
-
-    @Autowired
-    private UserService userService;
 
     @GetMapping
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
