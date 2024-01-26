@@ -1,8 +1,12 @@
 package org.apathinternational.faithpathrestful.model;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Table;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 
@@ -29,9 +33,13 @@ public class User {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "disabled", nullable = false)
-    @ColumnDefault("false") // "false" is the default value for "disabled
-    private Boolean disabled;
+    @Column(name = "enabled", nullable = false)
+    @ColumnDefault("true") // "false" is the default value for "enabled"
+    private Boolean enabled;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "role_id", nullable = false)
+    private Role role;
 
     // Constructors, getters, and setters
     public User() {
@@ -69,8 +77,12 @@ public class User {
         return password;
     }
 
-    public Boolean getDisabled() {
-        return disabled;
+    public Boolean getEnabled() {
+        return enabled;
+    }
+
+    public Role getRole() {
+        return role;
     }
 
     public void setUsername(String username) {
@@ -81,8 +93,12 @@ public class User {
     	this.password = password;
     }
 
-    public void setDisabled(Boolean disabled) {
-    	this.disabled = disabled;
+    public void setEnabled(Boolean enabled) {
+    	this.enabled = enabled;
+    }
+
+    public void setRole(Role role) {
+    	this.role = role;
     }
 
     // toString, hashCode, equals...

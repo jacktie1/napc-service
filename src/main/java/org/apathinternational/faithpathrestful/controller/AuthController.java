@@ -66,7 +66,7 @@ public class AuthController {
         User encrypted_user = new User();
         encrypted_user.setUsername(request.getUsername());
         encrypted_user.setPassword(passwordEncoder.encode(request.getPassword()));
-        encrypted_user.setDisabled(false);
+        encrypted_user.setEnabled(true);
         userService.createUser(encrypted_user);
     }
 }
