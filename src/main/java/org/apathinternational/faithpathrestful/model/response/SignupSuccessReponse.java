@@ -1,4 +1,4 @@
-package org.apathinternational.faithpathrestful.jsonmodel;
+package org.apathinternational.faithpathrestful.model.response;
 
 public class SignupSuccessReponse {
     private String message;

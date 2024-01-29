@@ -2,7 +2,7 @@ package org.apathinternational.faithpathrestful.service;
 
 import java.util.Optional;
 
-import org.apathinternational.faithpathrestful.model.User;
+import org.apathinternational.faithpathrestful.entity.User;
 import org.apathinternational.faithpathrestful.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;

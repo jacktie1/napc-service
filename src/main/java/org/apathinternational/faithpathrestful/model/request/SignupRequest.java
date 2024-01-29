@@ -1,16 +1,18 @@
-package org.apathinternational.faithpathrestful.jsonmodel;
+package org.apathinternational.faithpathrestful.model.request;
 
 public class SignupRequest {
     private String username;
     private String password;
+    private String emailAddress;
     private String role;
 
     public SignupRequest() {
     }
 
-    public SignupRequest(String username, String password, String role) {
+    public SignupRequest(String username, String password, String emailAddress, String role) {
         this.username = username;
         this.password = password;
+        this.emailAddress = emailAddress;
         this.role = role;
     }
     
@@ -20,6 +22,10 @@ public class SignupRequest {
     
     public String getPassword() {
         return password;
+    }
+
+    public String getEmailAddress() {
+        return emailAddress;
     }
     
     public String getRole() {
@@ -32,6 +38,10 @@ public class SignupRequest {
     
     public void setPassword(String password) {
         this.password= password;
+    }
+
+    public void setEmailAddress(String emailAddress) {
+        this.emailAddress = emailAddress;
     }
     
     public void setRole(String role) {

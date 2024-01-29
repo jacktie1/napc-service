@@ -1,4 +1,4 @@
-package org.apathinternational.faithpathrestful.model;
+package org.apathinternational.faithpathrestful.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -19,11 +19,11 @@ import jakarta.persistence.Column;
 @Entity
 @DynamicInsert
 @DynamicUpdate
-@Table(name = "users")
+@Table(name = "user")
 public class User {
 
     @Id
-    @Column(name = "id", updatable = false, nullable = false)
+    @Column(name = "user_id", updatable = false, nullable = false)
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long id;
 
@@ -32,6 +32,9 @@ public class User {
 
     @Column(name = "password", nullable = false)
     private String password;
+
+    @Column(name = "email_address", unique = true, nullable = false)
+    private String emailAddress;
 
     @Column(name = "enabled", nullable = false)
     @ColumnDefault("true") // "false" is the default value for "enabled"
@@ -45,26 +48,6 @@ public class User {
     public User() {
     }
 
-    public User(String username) {
-        this.username = username;
-    }
-
-    public User(Long id, String username) {
-        this.id = id;
-        this.username = username;
-    }
-    
-    public User(String username, String password) {
-        this.username = username;
-        this.password = password;
-    }
-
-    public User(Long id, String username, String password) {
-        this.id = id;
-        this.username = username;
-        this.password = password;
-    }
-
     public Long getId () {
         return id;
     }
@@ -75,6 +58,10 @@ public class User {
 
     public String getPassword() {
         return password;
+    }
+
+    public String getEmailAddress() {
+        return emailAddress;
     }
 
     public Boolean getEnabled() {
@@ -91,6 +78,10 @@ public class User {
 
     public void setPassword(String password) {
     	this.password = password;
+    }
+
+    public void setEmailAddress(String emailAddress) {
+    	this.emailAddress = emailAddress;
     }
 
     public void setEnabled(Boolean enabled) {

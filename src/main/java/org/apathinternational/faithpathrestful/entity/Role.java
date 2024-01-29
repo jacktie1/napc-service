@@ -1,4 +1,4 @@
-package org.apathinternational.faithpathrestful.model;
+package org.apathinternational.faithpathrestful.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -8,10 +8,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "roles")
+@Table(name = "role")
 public class Role {
 
     @Id
+    @Column(name = "role_id", updatable = false, nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 

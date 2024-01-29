@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <conversionRule conversionWord="transId" converterClass="org.apathinternational.faithpathrestful.common.util.ConditionalTransactionIdConverter" />
+    <springProperty scope="context" name="log.dir" source="spring.logback.logdir" />
+    <springProperty scope="context" name="application.name" source="spring.application.name" />
+    <springProfile name="dev">
+        <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+            <layout class="ch.qos.logback.classic.PatternLayout">
+                <Pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %transId%msg%n</Pattern>
+            </layout>
+        </appender>
+        <root level="info">
+            <appender-ref ref="Console" />
+        </root>
+    </springProfile>
+
+    <springProfile name="prod">
+        <appender name="RollingFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <file>${log.dir}/${application.name}.log</file>
+            <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+                <Pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %transId%msg%n</Pattern>
+            </encoder>
+            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                <maxHistory>30</maxHistory>
+                <fileNamePattern>${log.dir}/archived/${application.name}-%d{yyyy-MM-dd}.log</fileNamePattern>
+            </rollingPolicy>
+        </appender>
+        <root level="warn">
+            <appender-ref ref="RollingFile" />
+        </root>
+    </springProfile>
+</configuration>

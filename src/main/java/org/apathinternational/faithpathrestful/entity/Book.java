@@ -1,4 +1,4 @@
-package org.apathinternational.faithpathrestful.model;
+package org.apathinternational.faithpathrestful.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -8,11 +8,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Column;
 
 @Entity
-@Table(name = "books")
+@Table(name = "book")
 public class Book {
 
     @Id
-    @Column(name = "id", updatable = false, nullable = false)
+    @Column(name = "book_id", updatable = false, nullable = false)
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long id;
 

@@ -2,7 +2,7 @@ package org.apathinternational.faithpathrestful.repository;
 
 import java.util.Optional;
 
-import org.apathinternational.faithpathrestful.model.Role;
+import org.apathinternational.faithpathrestful.entity.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

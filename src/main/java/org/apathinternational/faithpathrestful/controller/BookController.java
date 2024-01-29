@@ -1,6 +1,6 @@
 package org.apathinternational.faithpathrestful.controller;
 
-import org.apathinternational.faithpathrestful.model.Book;
+import org.apathinternational.faithpathrestful.entity.Book;
 import org.apathinternational.faithpathrestful.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;

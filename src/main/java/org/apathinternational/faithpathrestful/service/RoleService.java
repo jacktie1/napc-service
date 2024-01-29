@@ -2,7 +2,7 @@ package org.apathinternational.faithpathrestful.service;
 
 import java.util.Optional;
 
-import org.apathinternational.faithpathrestful.model.Role;
+import org.apathinternational.faithpathrestful.entity.Role;
 import org.apathinternational.faithpathrestful.repository.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

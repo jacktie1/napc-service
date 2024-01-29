@@ -1,6 +1,6 @@
 package org.apathinternational.faithpathrestful.service;
 
-import org.apathinternational.faithpathrestful.model.Book;
+import org.apathinternational.faithpathrestful.entity.Book;
 import org.apathinternational.faithpathrestful.repository.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

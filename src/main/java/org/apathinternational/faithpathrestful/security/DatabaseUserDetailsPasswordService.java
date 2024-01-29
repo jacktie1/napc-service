@@ -3,8 +3,8 @@ package org.apathinternational.faithpathrestful.security;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.apathinternational.faithpathrestful.model.Role;
-import org.apathinternational.faithpathrestful.model.User;
+import org.apathinternational.faithpathrestful.entity.Role;
+import org.apathinternational.faithpathrestful.entity.User;
 import org.apathinternational.faithpathrestful.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;

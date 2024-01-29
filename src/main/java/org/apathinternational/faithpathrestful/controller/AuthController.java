@@ -4,12 +4,15 @@ import org.apathinternational.faithpathrestful.security.DatabaseUserDetailsServi
 import org.apathinternational.faithpathrestful.security.JwtTokenProvider;
 import org.apathinternational.faithpathrestful.service.RoleService;
 import org.apathinternational.faithpathrestful.service.UserService;
-import org.apathinternational.faithpathrestful.jsonmodel.ErrorResponse;
-import org.apathinternational.faithpathrestful.jsonmodel.LoginSuccessResponse;
-import org.apathinternational.faithpathrestful.jsonmodel.SignupRequest;
-import org.apathinternational.faithpathrestful.jsonmodel.SignupSuccessReponse;
-import org.apathinternational.faithpathrestful.model.Role;
-import org.apathinternational.faithpathrestful.model.User;
+import org.apathinternational.faithpathrestful.model.request.SignupRequest;
+import org.apathinternational.faithpathrestful.model.response.LoginSuccessResponse;
+import org.apathinternational.faithpathrestful.model.response.SignupSuccessReponse;
+import org.apathinternational.faithpathrestful.entity.Role;
+import org.apathinternational.faithpathrestful.entity.User;
+import org.apathinternational.faithpathrestful.common.exception.ValidationException;
+import org.apathinternational.faithpathrestful.common.exception.BusinessException;
+import org.apathinternational.faithpathrestful.response.ResponseHandler;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -50,20 +53,21 @@ public class AuthController {
                 new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword())
             );
         } catch (BadCredentialsException e) {
-            // Invalid password
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(new ErrorResponse("Invalid credentials. Please check the username/password and try again."));
+            throw new BusinessException("Invalid username or password.");
         } catch (DisabledException e) {
             // User disabled
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                .body(new ErrorResponse("User account is disabled. Please contact support for assistance."));
+            throw new BusinessException("User account is disabled. Please contact support for assistance.");
         }
 
         final UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
 
         String token = jwtTokenProvider.createToken(userDetails.getUsername());
+
+        User authedUser = userService.getUserByUsername(userDetails.getUsername());
+
+        String role = authedUser.getRole().getName();
     
-        return ResponseEntity.ok(new LoginSuccessResponse(token));
+        return ResponseHandler.generateResponse(new LoginSuccessResponse(token, role));
     }
 
     @PostMapping("/signup")
@@ -71,20 +75,20 @@ public class AuthController {
     public ResponseEntity<?> register(@RequestBody SignupRequest request) {
         User encrypted_user = new User();
         encrypted_user.setUsername(request.getUsername());
+        encrypted_user.setEmailAddress(request.getEmailAddress());
         encrypted_user.setPassword(passwordEncoder.encode(request.getPassword()));
 
         Role role = roleService.getRoleByName(request.getRole());
 
         if(role == null)
         {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(new ErrorResponse("Invalid role. Please check the role and try again."));
+            throw new ValidationException("Invalid role. Please check the role and try again.");
         }
 
         encrypted_user.setRole(role);
         encrypted_user.setEnabled(true);
         userService.createUser(encrypted_user);
 
-        return ResponseEntity.ok(new SignupSuccessReponse("User created successfully."));
+        return ResponseHandler.generateResponse(new SignupSuccessReponse("User created successfully."));
     }
 }

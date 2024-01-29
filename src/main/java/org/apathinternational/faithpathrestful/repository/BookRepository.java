@@ -1,6 +1,6 @@
 package org.apathinternational.faithpathrestful.repository;
 
-import org.apathinternational.faithpathrestful.model.Book;
+import org.apathinternational.faithpathrestful.entity.Book;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
