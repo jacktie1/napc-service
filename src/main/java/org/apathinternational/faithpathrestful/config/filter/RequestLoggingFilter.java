@@ -95,7 +95,7 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
 
         StringBuffer respInfo = new StringBuffer()
         .append("[TransId: ").append(transId).append("] ")
-        .append("Reponse Details: ")
+        .append("Response Details: ")
         .append("statusCode=" + response.getStatus())
         .append(", body=" + jsonFormatter.format(responsePayload));
    
