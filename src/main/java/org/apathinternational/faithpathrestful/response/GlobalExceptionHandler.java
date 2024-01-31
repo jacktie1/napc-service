@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.AuthorizationServiceException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
@@ -35,6 +36,15 @@ public class GlobalExceptionHandler {
         map.put("error", new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Internal server error found. Please contact support for assistance"));
         map.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
         return new ResponseEntity<Object>(map, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(AuthorizationServiceException.class)
+    public ResponseEntity<Object> handleAuthorizationServiceException(AuthorizationServiceException ex) {
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("result", null);
+        map.put("error", new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), ex.getMessage()));
+        map.put("status", HttpStatus.UNAUTHORIZED.value());
+        return new ResponseEntity<Object>(map, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
