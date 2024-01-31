@@ -11,6 +11,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,16 +26,54 @@ import java.util.Map;
 public class GlobalExceptionHandler {
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
+    // Here starts the handlers for the framework exceptions
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleException(Exception ex) {
         logger.error("Exception: ", ex);
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("result", null);
-        map.put("error", new ErrorResponse(Constants.ERROR_CODE_UNKNOWN_EXCEPTION, "Internal server error found. Please contact support for assistance"));
+        map.put("error", new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Internal server error found. Please contact support for assistance"));
         map.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
         return new ResponseEntity<Object>(map, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    public ResponseEntity<Object> handleHttpMediaTypeNotSupportedException(HttpMediaTypeNotSupportedException ex) {
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("result", null);
+        map.put("error", new ErrorResponse(HttpStatus.UNSUPPORTED_MEDIA_TYPE.value(), ex.getMessage()));
+        map.put("status", HttpStatus.UNSUPPORTED_MEDIA_TYPE.value());
+        return new ResponseEntity<Object>(map, HttpStatus.UNSUPPORTED_MEDIA_TYPE);
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<Object> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException ex) {
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("result", null);
+        map.put("error", new ErrorResponse(HttpStatus.METHOD_NOT_ALLOWED.value(), ex.getMessage()));
+        map.put("status", HttpStatus.METHOD_NOT_ALLOWED.value());
+        return new ResponseEntity<Object>(map, HttpStatus.METHOD_NOT_ALLOWED);
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<Object> handleNoResourceFoundException(NoResourceFoundException ex) {
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("result", null);
+        map.put("error", new ErrorResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage()));
+        map.put("status", HttpStatus.NOT_FOUND.value());
+        return new ResponseEntity<Object>(map, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<Object> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("result", null);
+        map.put("error", new ErrorResponse(HttpStatus.BAD_REQUEST.value(), ex.getMessage()));
+        map.put("status", HttpStatus.BAD_REQUEST.value());
+        return new ResponseEntity<Object>(map, HttpStatus.BAD_REQUEST);
+    }
+    
+    // Here starts the handlers for the application exceptions
     @ExceptionHandler(ApplicationException.class)
     public ResponseEntity<Object> handleApplicationException(ApplicationException ex) {
         Map<String, Object> map = new HashMap<String, Object>();

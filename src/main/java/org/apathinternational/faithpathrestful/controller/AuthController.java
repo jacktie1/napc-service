@@ -66,8 +66,10 @@ public class AuthController {
         User authedUser = userService.getUserByUsername(userDetails.getUsername());
 
         String role = authedUser.getRole().getName();
+        String firstName = authedUser.getFirstName();
+        String lastName = authedUser.getLastName();
     
-        return ResponseHandler.generateResponse(new LoginSuccessResponse(token, role));
+        return ResponseHandler.generateResponse(new LoginSuccessResponse(token, role, firstName, lastName));
     }
 
     @PostMapping("/signup")

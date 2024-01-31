@@ -20,7 +20,7 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
     private static final Logger logger = LoggerFactory.getLogger(RequestLoggingFilter.class);
 
     private boolean includeResponsePayload = true;
-    private int maxPayloadLength = 1000;
+    private int maxPayloadLength = 500;
     private LoggingJsonFormatter jsonFormatter = new LoggingJsonFormatter();
   
     private String getContentAsString(byte[] buf, int maxLength, String charsetName) {
