@@ -20,7 +20,7 @@ import jakarta.persistence.Column;
 @DynamicInsert
 @DynamicUpdate
 @Table(name = "user")
-public class User {
+public class User extends AuditableEntity {
 
     @Id
     @Column(name = "user_id", updatable = false, nullable = false)

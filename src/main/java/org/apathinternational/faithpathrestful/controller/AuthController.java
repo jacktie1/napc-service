@@ -22,6 +22,7 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -74,11 +75,14 @@ public class AuthController {
 
     @PostMapping("/signup")
     @ResponseStatus(code = HttpStatus.CREATED)
+    @Transactional
     public ResponseEntity<?> register(@RequestBody SignupRequest request) {
         User encrypted_user = new User();
         encrypted_user.setUsername(request.getUsername());
         encrypted_user.setEmailAddress(request.getEmailAddress());
         encrypted_user.setPassword(passwordEncoder.encode(request.getPassword()));
+        encrypted_user.setFirstName(request.getFirstName());
+        encrypted_user.setLastName(request.getLastName());
 
         Role role = roleService.getRoleByName(request.getRole());
 

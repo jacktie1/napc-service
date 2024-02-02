@@ -13,14 +13,22 @@ CREATE TABLE IF NOT EXISTS `user` (
     `first_name` VARCHAR(255) NOT NULL,
     `last_name` VARCHAR(255) NOT NULL,
     `enabled` BOOLEAN NOT NULL DEFAULT true,
-    `role_id` BIGINT NOT NULL REFERENCES `role`(`role_id`)
+    `role_id` BIGINT NOT NULL REFERENCES `role`(`role_id`),
+    `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `created_by` BIGINT NOT NULL DEFAULT -1 REFERENCES `user`(`user_id`),
+    `modified_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `modified_by` BIGINT NOT NULL DEFAULT -1 REFERENCES `user`(`user_id`)
 );
 
 CREATE TABLE IF NOT EXISTS `user_security_question` (
     `user_security_question_id` BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `user_id` BIGINT NOT NULL REFERENCES `user`(`user_id`),
     `security_question` VARCHAR(255) NOT NULL,
-    `security_answer` VARCHAR(255) NOT NULL
+    `security_answer` VARCHAR(255) NOT NULL,
+    `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `created_by` BIGINT NOT NULL DEFAULT -1 REFERENCES `user`(`user_id`),
+    `modified_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `modified_by` BIGINT NOT NULL DEFAULT -1 REFERENCES `user`(`user_id`)
 );
 
 CREATE TABLE IF NOT EXISTS `student` (
@@ -56,6 +64,10 @@ CREATE TABLE IF NOT EXISTS `student` (
     `contact_email_address` VARCHAR(255),
     `student_comment` TEXT,
     `admin_comment` TEXT,
+    `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `created_by` BIGINT NOT NULL DEFAULT -1 REFERENCES `user`(`user_id`),
+    `modified_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `modified_by` BIGINT NOT NULL DEFAULT -1 REFERENCES `user`(`user_id`),
     CHECK (needs_airport_pickup is false or has_flight_information is not null),
     CHECK (has_flight_information is null or has_flight_information is false or (arrival_flight_number is not null and arrival_airline is not null and arrival_datetime is not null and departure_flight_number is not null and departure_airline is not null and departure_datetime is not null and num_lg_luggages is not null and num_sm_luggages is not null)),
     CHECK (needs_temp_housing is false or num_nights is not null),
@@ -87,6 +99,10 @@ CREATE TABLE IF NOT EXISTS `volunteer` (
     `gender_preference` VARCHAR(255),
     `provides_rides` BOOLEAN NOT NULL,
     `temp_housing_comment` TEXT,
+    `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `created_by` BIGINT NOT NULL DEFAULT -1 REFERENCES `user`(`user_id`),
+    `modified_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `modified_by` BIGINT NOT NULL DEFAULT -1 REFERENCES `user`(`user_id`),
     CHECK (provides_temp_housing is false or home_address is not null)
 );
 
@@ -94,13 +110,21 @@ CREATE TABLE IF NOT EXISTS `adminstrator` (
     `adminstrator_id` BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `user_id` BIGINT NOT NULL REFERENCES `user`(`user_id`),
     `affiliation` VARCHAR(255) NOT NULL,
-    `primary_phone_number` VARCHAR(255) NOT NULL
+    `primary_phone_number` VARCHAR(255) NOT NULL,
+    `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `created_by` BIGINT NOT NULL REFERENCES `user`(`user_id`),
+    `modified_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `modified_by` BIGINT NOT NULL REFERENCES `user`(`user_id`)
 );
 
 CREATE TABLE IF NOT EXISTS `airport_pickup_assignment` (
     `airport_pickup_assignment_id` BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `volunteer_id` BIGINT NOT NULL REFERENCES `volunteer`(`volunteer_id`),
     `student_id` BIGINT NOT NULL REFERENCES `student`(`student_id`),
+    `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `created_by` BIGINT NOT NULL DEFAULT -1 REFERENCES `user`(`user_id`),
+    `modified_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `modified_by` BIGINT NOT NULL DEFAULT -1 REFERENCES `user`(`user_id`),
     UNIQUE(`volunteer_id`, `student_id`)
 );
 
@@ -108,6 +132,10 @@ CREATE TABLE IF NOT EXISTS `airport_pickup_preference` (
     `airport_pickup_preference_id` BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `volunteer_id` BIGINT NOT NULL REFERENCES `volunteer`(`volunteer_id`),
     `student_id` BIGINT NOT NULL REFERENCES `student`(`student_id`),
+    `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `created_by` BIGINT NOT NULL DEFAULT -1 REFERENCES `user`(`user_id`),
+    `modified_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `modified_by` BIGINT NOT NULL DEFAULT -1 REFERENCES `user`(`user_id`),
     UNIQUE(`volunteer_id`, `student_id`)
 );
 
@@ -115,6 +143,10 @@ CREATE TABLE IF NOT EXISTS `temp_housing_assignment` (
     `temp_housing_assignment_id` BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `volunteer_id` BIGINT NOT NULL REFERENCES `volunteer`(`volunteer_id`),
     `student_id` BIGINT NOT NULL REFERENCES `student`(`student_id`),
+    `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `created_by` BIGINT NOT NULL DEFAULT -1 REFERENCES `user`(`user_id`),
+    `modified_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `modified_by` BIGINT NOT NULL DEFAULT -1 REFERENCES `user`(`user_id`),
     UNIQUE(`volunteer_id`, `student_id`)
 );
 
@@ -123,7 +155,11 @@ CREATE TABLE IF NOT EXISTS `management` (
     `does_assignment_start` BOOLEAN NOT NULL,
     `student_registration_start_date` DATE NOT NULL,
     `student_registration_end_date` DATE NOT NULL,
-    `announcement` TEXT
+    `announcement` TEXT,
+    `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `created_by` BIGINT NOT NULL DEFAULT -1 REFERENCES `user`(`user_id`),
+    `modified_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `modified_by` BIGINT NOT NULL DEFAULT -1 REFERENCES `user`(`user_id`)
 );
 
 CREATE TABLE IF NOT EXISTS `reference` (
@@ -131,8 +167,12 @@ CREATE TABLE IF NOT EXISTS `reference` (
     `reference_type` VARCHAR(255) NOT NULL,
     `key` VARCHAR(255) NOT NULL,
     `value` VARCHAR(255) NOT NULL,
-    `alternate_value` TEXT,
+    `alternate_value` VARCHAR(255),
     `parent_reference_id` BIGINT REFERENCES `reference`(`reference_id`),
+    `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `created_by` BIGINT NOT NULL DEFAULT -1 REFERENCES `user`(`user_id`),
+    `modified_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `modified_by` BIGINT NOT NULL DEFAULT -1 REFERENCES `user`(`user_id`),
     UNIQUE(`reference_type`, `key`)
 );
 
@@ -148,6 +188,22 @@ VALUES
 ),
 (
     'Volunteer'
+);
+
+-- A fake user to be referenced by system processes
+INSERT INTO user (user_id, username, password, email_address, first_name, last_name, enabled, role_id, created_by, modified_by)
+VALUES
+(
+    -1,
+    'system-process',
+    'login-disabled',
+    'non-existing-email@nodomain.com',
+    'System',
+    'Process',
+    false,
+    1,
+    -1,
+    -1
 );
 
 -- Management
