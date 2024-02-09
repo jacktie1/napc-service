@@ -8,6 +8,7 @@ import jakarta.persistence.JoinColumn;
 
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 
@@ -60,6 +61,9 @@ public class User extends AuditableEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     List<UserSecurityQuestion> securityQuestions;
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Student student;
+
     // Constructors, getters, and setters
     public User() {
     }
@@ -104,6 +108,10 @@ public class User extends AuditableEntity {
         return securityQuestions;
     }
 
+    public Student getStudent() {
+        return student;
+    }
+
     public void setUsername(String username) {
     	this.username = username;
     }
@@ -138,6 +146,22 @@ public class User extends AuditableEntity {
 
     public void setSecurityQuestions(List<UserSecurityQuestion> securityQuestions) {
         this.securityQuestions = securityQuestions;
+    }
+
+    public void setStudent(Student student) {
+        this.student = student;
+    }
+
+    public boolean isStudent() {
+        return role.getName().equals("Student");
+    }
+
+    public boolean isVolunteer() {
+        return role.getName().equals("Volunteer");
+    }
+
+    public boolean isAdmin() {
+        return role.getName().equals("Admin");
     }
 
     // toString, hashCode, equals...

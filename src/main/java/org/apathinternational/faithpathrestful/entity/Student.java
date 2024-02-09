@@ -25,7 +25,7 @@ public class Student extends AuditableEntity {
     @Id
     @Column(name = "student_id", updatable = false, nullable = false)
     @GeneratedValue(strategy=GenerationType.IDENTITY)
-    private Long studentId;
+    private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -131,8 +131,8 @@ public class Student extends AuditableEntity {
     public Student() {
     }
 
-    public Long getStudentId() {
-        return studentId;
+    public Long getId() {
+        return id;
     }
 
     public User getUser() {

@@ -1,5 +1,7 @@
 package org.apathinternational.faithpathrestful.model.entityDTO;
 
+import org.apathinternational.faithpathrestful.entity.Student;
+
 public class StudentCommentDTO {
     private String studentComment;
 
@@ -8,9 +10,9 @@ public class StudentCommentDTO {
     public StudentCommentDTO() {
     }
 
-    public StudentCommentDTO(String studentComment, String adminComment) {
-        this.studentComment = studentComment;
-        this.adminComment = adminComment;
+    public StudentCommentDTO(Student student) {
+        this.studentComment = student.getStudentComment();
+        this.adminComment = student.getAdminComment();
     }
 
     public String getStudentComment() {

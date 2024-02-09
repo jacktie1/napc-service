@@ -6,7 +6,7 @@ import org.apathinternational.faithpathrestful.entity.Management;
 
 
 public class ManagementDTO {
-    private Long id;
+    private Long managementId;
     private Boolean doesAssignmentStart;
     private LocalDate studentRegistrationStartDate;
     private LocalDate studentRegistrationEndDate;
@@ -16,27 +16,27 @@ public class ManagementDTO {
     }
 
     public ManagementDTO(Management management) {
-        this.id = management.getId();
+        this.managementId = management.getId();
         this.doesAssignmentStart = management.getDoesAssignmentStart();
         this.studentRegistrationStartDate = management.getStudentRegistrationStartDate();
         this.studentRegistrationEndDate = management.getStudentRegistrationEndDate();
         this.announcement = management.getAnnouncement();
     }
 
-    public ManagementDTO(Long id, Boolean doesAssignmentStart, LocalDate studentRegistrationStartDate, LocalDate studentRegistrationEndDate, String announcement) {
-        this.id = id;
+    public ManagementDTO(Long managementId, Boolean doesAssignmentStart, LocalDate studentRegistrationStartDate, LocalDate studentRegistrationEndDate, String announcement) {
+        this.managementId = managementId;
         this.doesAssignmentStart = doesAssignmentStart;
         this.studentRegistrationStartDate = studentRegistrationStartDate;
         this.studentRegistrationEndDate = studentRegistrationEndDate;
         this.announcement = announcement;
     }
 
-    public Long getId() {
-        return id;
+    public Long getManagementId() {
+        return managementId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setManagementId(Long managementId) {
+        this.managementId = managementId;
     }
 
     public Boolean getDoesAssignmentStart() {

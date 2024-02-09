@@ -5,7 +5,7 @@ import org.apathinternational.faithpathrestful.entity.Reference;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 public class ReferenceDTO {
-    private Long id;
+    private Long referenceId;
     private String referenceType;
     private String value;
     private String alternateValue;
@@ -17,44 +17,44 @@ public class ReferenceDTO {
     }
 
     public ReferenceDTO(Reference reference) {
-        this.id = reference.getId();
+        this.referenceId = reference.getId();
         this.referenceType = reference.getReferenceType();
         this.value = reference.getValue();
         this.alternateValue = reference.getAlternateValue();
 
         if(reference.getParentReference() != null) {
             // non recursive
-            Reference paReference = reference.getParentReference();
+            Reference parentReference = reference.getParentReference();
             this.parentReference = new ReferenceDTO(
-                paReference.getId(),
-                paReference.getReferenceType(),
-                paReference.getValue(),
-                paReference.getAlternateValue()
+                parentReference.getId(),
+                parentReference.getReferenceType(),
+                parentReference.getValue(),
+                parentReference.getAlternateValue()
             );
         }
     }
 
-    public ReferenceDTO(Long id, String referenceType, String value, String alternateValue) {
-        this.id = id;
+    public ReferenceDTO(Long referenceId, String referenceType, String value, String alternateValue) {
+        this.referenceId = referenceId;
         this.referenceType = referenceType;
         this.value = value;
         this.alternateValue = alternateValue;
     }
 
-    public ReferenceDTO(Long id, String referenceType, String value, String alternateValue, ReferenceDTO parentReference) {
-        this.id = id;
+    public ReferenceDTO(Long referenceId, String referenceType, String value, String alternateValue, ReferenceDTO parentReference) {
+        this.referenceId = referenceId;
         this.referenceType = referenceType;
         this.value = value;
         this.alternateValue = alternateValue;
         this.parentReference = parentReference;
     }
 
-    public Long getId() {
-        return id;
+    public Long getReferenceId() {
+        return referenceId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setReferenceId(Long referenceId) {
+        this.referenceId = referenceId;
     }
 
     public String getReferenceType() {

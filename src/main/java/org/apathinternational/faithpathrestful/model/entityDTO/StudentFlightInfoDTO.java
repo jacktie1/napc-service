@@ -2,6 +2,7 @@ package org.apathinternational.faithpathrestful.model.entityDTO;
 
 import java.time.LocalDateTime;
 
+import org.apathinternational.faithpathrestful.entity.Student;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -11,7 +12,7 @@ public class StudentFlightInfoDTO {
     @NotNull
     private Boolean needsAirportPickup;
 
-    private Boolean HasFlightInfo;
+    private Boolean hasFlightInfo;
 
     private String arrivalFlightNumber;
 
@@ -38,19 +39,30 @@ public class StudentFlightInfoDTO {
     public StudentFlightInfoDTO() {
     }
 
-    public StudentFlightInfoDTO(Boolean needsAirportPickup, Boolean hasFlightInfo, String arrivalFlightNumber, Long arrivalAirlineReferenceId, String customArrivalAirline, LocalDateTime arrivalDatetime, String departureFlightNumber, Long departureAirlineReferenceId, String customDepartureAirline, LocalDateTime departureDatetime, Integer numLgLuggages, Integer numSmLuggages) {
-        this.needsAirportPickup = needsAirportPickup;
-        HasFlightInfo = hasFlightInfo;
-        this.arrivalFlightNumber = arrivalFlightNumber;
-        this.arrivalAirlineReferenceId = arrivalAirlineReferenceId;
-        this.customArrivalAirline = customArrivalAirline;
-        this.arrivalDatetime = arrivalDatetime;
-        this.departureFlightNumber = departureFlightNumber;
-        this.departureAirlineReferenceId = departureAirlineReferenceId;
-        this.customDepartureAirline = customDepartureAirline;
-        this.departureDatetime = departureDatetime;
-        this.numLgLuggages = numLgLuggages;
-        this.numSmLuggages = numSmLuggages;
+    public StudentFlightInfoDTO(Student student)
+    {
+        this.needsAirportPickup = student.getNeedsAirportPickup();
+        this.hasFlightInfo = student.getHasFlightInfo();
+        this.arrivalFlightNumber = student.getArrivalFlightNumber();
+
+        if(student.getArrivalAirlineReference() != null)
+        {
+            this.arrivalAirlineReferenceId = student.getArrivalAirlineReference().getId();
+        }
+        
+        this.customArrivalAirline = student.getCustomArrivalAirline();
+        this.arrivalDatetime = student.getArrivalDatetime();
+        this.departureFlightNumber = student.getDepartureFlightNumber();
+
+        if(student.getDepartureAirlineReference() != null)
+        {
+            this.departureAirlineReferenceId = student.getDepartureAirlineReference().getId();
+        }
+
+        this.customDepartureAirline = student.getCustomDepartureAirline();
+        this.departureDatetime = student.getDepartureDatetime();
+        this.numLgLuggages = student.getNumLgLuggages();
+        this.numSmLuggages = student.getNumSmLuggages();
     }
 
     public Boolean getNeedsAirportPickup() {
@@ -58,7 +70,7 @@ public class StudentFlightInfoDTO {
     }
 
     public Boolean getHasFlightInfo() {
-        return HasFlightInfo;
+        return hasFlightInfo;
     }
 
     public String getArrivalFlightNumber() {
@@ -106,7 +118,7 @@ public class StudentFlightInfoDTO {
     }
 
     public void setHasFlightInfo(Boolean hasFlightInfo) {
-        HasFlightInfo = hasFlightInfo;
+        this.hasFlightInfo = hasFlightInfo;
     }
 
     public void setArrivalFlightNumber(String arrivalFlightNumber) {

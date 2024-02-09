@@ -3,6 +3,8 @@ package org.apathinternational.faithpathrestful.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apathinternational.faithpathrestful.common.exception.BusinessException;
+import org.apathinternational.faithpathrestful.common.exception.CustomAccessDeniedException;
 import org.apathinternational.faithpathrestful.entity.Reference;
 import org.apathinternational.faithpathrestful.entity.Student;
 import org.apathinternational.faithpathrestful.entity.User;
@@ -13,15 +15,20 @@ import org.apathinternational.faithpathrestful.model.entityDTO.StudentProfileDTO
 import org.apathinternational.faithpathrestful.model.entityDTO.StudentTempHousingDTO;
 import org.apathinternational.faithpathrestful.model.entityDTO.UserAccountDTO;
 import org.apathinternational.faithpathrestful.model.request.RegisterStudentRequest;
+import org.apathinternational.faithpathrestful.model.response.GetStudentResponse;
 import org.apathinternational.faithpathrestful.model.response.MessageReponse;
 import org.apathinternational.faithpathrestful.response.ResponseHandler;
+import org.apathinternational.faithpathrestful.service.SessionService;
 import org.apathinternational.faithpathrestful.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,6 +46,9 @@ public class StudentController {
 
     @Autowired
     private StudentService studentService;
+
+    @Autowired
+    private SessionService sessionService;
 
     @PostMapping("/register")
     @ResponseStatus(code = HttpStatus.CREATED)
@@ -146,6 +156,94 @@ public class StudentController {
         studentService.createStudent(studentUser);
 
         return ResponseHandler.generateResponse(new MessageReponse("User created successfully."));
+    }
+
+    @GetMapping("/getProfile/{userId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STUDENT') or hasRole('ROLE_VOLUNTEER')")
+    public ResponseEntity<?> getProfile(@PathVariable(required=true, name="userId") Long userId) {
+        User authedUser = sessionService.getAuthedUser();
+
+        if(authedUser.isStudent() && !authedUser.getId().equals(userId)) {
+            throw new CustomAccessDeniedException("You are not authorized to view this student.");
+        }
+
+        Student student = studentService.getStudentByUserId(userId);
+
+        if(student == null) {
+            throw new BusinessException("User is found but student data is missing.");
+        }
+
+        GetStudentResponse response = new GetStudentResponse();
+
+        response.setStudentProfile(student);
+
+        return ResponseHandler.generateResponse(response);
+    }
+
+    @GetMapping("/getFlightInfo/{userId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STUDENT') or hasRole('ROLE_VOLUNTEER')")
+    public ResponseEntity<?> getFlightInfo(@PathVariable(required=true, name="userId") Long userId) {
+        User authedUser = sessionService.getAuthedUser();
+
+        if(authedUser.isStudent() && !authedUser.getId().equals(userId)) {
+            throw new CustomAccessDeniedException("You are not authorized to view this student.");
+        }
+
+        Student student = studentService.getStudentByUserId(userId);
+
+        if(student == null) {
+            throw new BusinessException("User is found but student data is missing.");
+        }
+
+        GetStudentResponse response = new GetStudentResponse();
+
+        response.setStudentFlightInfo(student);
+
+        return ResponseHandler.generateResponse(response);
+    }
+
+    @GetMapping("/getTempHousing/{userId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STUDENT') or hasRole('ROLE_VOLUNTEER')")
+    public ResponseEntity<?> getTempHousing(@PathVariable(required=true, name="userId") Long userId) {
+        User authedUser = sessionService.getAuthedUser();
+
+        if(authedUser.isStudent() && !authedUser.getId().equals(userId)) {
+            throw new CustomAccessDeniedException("You are not authorized to view this student.");
+        }
+
+        Student student = studentService.getStudentByUserId(userId);
+
+        if(student == null) {
+            throw new BusinessException("User is found but student data is missing.");
+        }
+
+        GetStudentResponse response = new GetStudentResponse();
+
+        response.setStudentTempHousing(student);
+
+        return ResponseHandler.generateResponse(response);
+    }
+
+    @GetMapping("/getComment/{userId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STUDENT') or hasRole('ROLE_VOLUNTEER')")
+    public ResponseEntity<?> getComment(@PathVariable(required=true, name="userId") Long userId) {
+        User authedUser = sessionService.getAuthedUser();
+
+        if(authedUser.isStudent() && !authedUser.getId().equals(userId)) {
+            throw new CustomAccessDeniedException("You are not authorized to view this profile.");
+        }
+
+        Student student = studentService.getStudentByUserId(userId);
+
+        if(student == null) {
+            throw new BusinessException("User is found but student data is missing.");
+        }
+
+        GetStudentResponse response = new GetStudentResponse();
+
+        response.setStudentComment(student);
+
+        return ResponseHandler.generateResponse(response);
     }
     
     

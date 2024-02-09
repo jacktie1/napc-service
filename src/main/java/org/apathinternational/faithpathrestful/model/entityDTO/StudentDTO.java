@@ -1,9 +1,15 @@
 package org.apathinternational.faithpathrestful.model.entityDTO;
 
+import org.apathinternational.faithpathrestful.entity.Student;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 public class StudentDTO {
-    private Long id;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Long studentId;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private UserAccountDTO userAccount;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private StudentProfileDTO studentProfile;
@@ -20,16 +26,21 @@ public class StudentDTO {
     public StudentDTO() {
     }
 
-    public StudentDTO(Long id, UserAccountDTO userAccount, StudentProfileDTO studentProfile, StudentFlightInfoDTO studentFlightInfo, StudentTempHousingDTO studentTempHousing, StudentCommentDTO studentComment) {
-        this.id = id;
-        this.studentProfile = studentProfile;
-        this.studentFlightInfo = studentFlightInfo;
-        this.studentTempHousing = studentTempHousing;
-        this.studentComment = studentComment;
+    public StudentDTO(Student student) {
+        this.studentId = student.getId();
+        this.userAccount = new UserAccountDTO(student.getUser());
+        this.studentProfile = new StudentProfileDTO(student);
+        this.studentFlightInfo = new StudentFlightInfoDTO(student);
+        this.studentTempHousing = new StudentTempHousingDTO(student);
+        this.studentComment = new StudentCommentDTO(student);
     }
 
-    public Long getId() {
-        return id;
+    public Long getStudentId() {
+        return studentId;
+    }
+
+    public UserAccountDTO getUserAccount() {
+        return userAccount;
     }
 
     public StudentProfileDTO getStudentProfile() {
@@ -48,8 +59,12 @@ public class StudentDTO {
         return studentComment;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setStudentId(Long studentId) {
+        this.studentId = studentId;
+    }
+
+    public void setUserAccount(UserAccountDTO userAccount) {
+        this.userAccount = userAccount;
     }
 
     public void setStudentProfile(StudentProfileDTO studentProfile) {
@@ -66,5 +81,29 @@ public class StudentDTO {
 
     public void setStudentComment(StudentCommentDTO studentComment) {
         this.studentComment = studentComment;
+    }
+
+    public void setUserAccount(Student student) {
+        this.setUserAccount(new UserAccountDTO(student.getUser()));
+    }
+
+    public void setStudentProfile(Student student) {
+        this.setStudentProfile(new StudentProfileDTO(student));
+    }
+
+    public void setStudentFlightInfo(Student student) {
+        this.setStudentFlightInfo(new StudentFlightInfoDTO(student));
+    }
+
+    public void setStudentTempHousing(Student student) {
+        this.setStudentTempHousing(new StudentTempHousingDTO(student));
+    }
+
+    public void setStudentComment(Student student) {
+        this.setStudentComment(new StudentCommentDTO(student));
+    }
+
+    public void setStudentId(Student student) {
+        this.setStudentId(student.getId());
     }
 }

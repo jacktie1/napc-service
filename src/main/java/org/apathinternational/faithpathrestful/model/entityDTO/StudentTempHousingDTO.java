@@ -1,5 +1,7 @@
 package org.apathinternational.faithpathrestful.model.entityDTO;
 
+import org.apathinternational.faithpathrestful.entity.Student;
+
 import jakarta.validation.constraints.NotNull;
 
 public class StudentTempHousingDTO {
@@ -21,14 +23,18 @@ public class StudentTempHousingDTO {
     public StudentTempHousingDTO() {
     }
 
-    public StudentTempHousingDTO(Boolean needsTempHousing, Integer numNights, Long apartmentReferenceId, String customDestinationAddress, String contactName, String contactPhoneNumber, String contactEmailAddress) {
-        this.needsTempHousing = needsTempHousing;
-        this.numNights = numNights;
-        this.apartmentReferenceId = apartmentReferenceId;
-        this.customDestinationAddress = customDestinationAddress;
-        this.contactName = contactName;
-        this.contactPhoneNumber = contactPhoneNumber;
-        this.contactEmailAddress = contactEmailAddress;
+    public StudentTempHousingDTO(Student student) {
+        this.needsTempHousing = student.getNeedsTempHousing();
+        this.numNights = student.getNumNights();
+
+        if(student.getApartmentReference() != null)
+        {
+            this.apartmentReferenceId = student.getApartmentReference().getId();
+        }
+        this.customDestinationAddress = student.getCustomDestinationAddress();
+        this.contactName = student.getContactName();
+        this.contactPhoneNumber = student.getContactPhoneNumber();
+        this.contactEmailAddress = student.getContactEmailAddress();        
     }
 
     public Boolean getNeedsTempHousing() {

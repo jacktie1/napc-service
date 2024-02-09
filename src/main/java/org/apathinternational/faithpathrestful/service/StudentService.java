@@ -35,6 +35,11 @@ public class StudentService {
 
         User studentUser = student.getUser();
 
+        if(userService.getUserByUsername(studentUser.getUsername()) != null)
+        {
+            throw new BusinessException("Username already exists. Please choose a different username and try again.");
+        }
+
         Role role = roleService.getRoleByName("Student");
 
         if(role == null)
@@ -139,5 +144,23 @@ public class StudentService {
         student.setUser(savedUser);
         
         return studentRepository.save(student);
+    }
+
+    public Student getStudentByUserId(Long userId) {
+        User studentUser = userService.getUserById(userId);
+
+        if(studentUser == null)
+        {
+            throw new BusinessException("User not found. Please check the user and try again.");
+        }
+
+        if(studentUser.isStudent())
+        {
+            return studentUser.getStudent();
+        }
+        else
+        {
+            throw new BusinessException("User is not a student. Please check the user and try again.");
+        }
     }
 }

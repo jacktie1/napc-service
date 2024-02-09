@@ -1,5 +1,8 @@
 package org.apathinternational.faithpathrestful.model.entityDTO;
 
+import org.apathinternational.faithpathrestful.entity.Student;
+import org.apathinternational.faithpathrestful.entity.User;
+
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -42,6 +45,29 @@ public class StudentProfileDTO {
     private String usPhoneNumber;
 
     public StudentProfileDTO() {
+    }
+
+    public StudentProfileDTO(Student student) {
+        User studentUser = student.getUser();
+        this.firstName = studentUser.getFirstName();
+        this.lastName = studentUser.getLastName();
+        this.englishName = student.getEnglishName();
+        this.gender = studentUser.getGender();
+        this.isNewStudent = student.getIsNewStudent();
+        this.studentType = student.getStudentType();
+        this.graduatesFrom = student.getGraduatesFrom();
+
+        if(student.getMajorReference() != null)
+        {
+            this.majorReferenceId = student.getMajorReference().getId();
+        }
+        
+        this.customMajor = student.getCustomMajor();
+        this.hasCompanion = student.getHasCompanion();
+        this.emailAddress = studentUser.getEmailAddress();
+        this.wechatId = student.getWechatId();
+        this.cnPhoneNumber = student.getCnPhoneNumber();
+        this.usPhoneNumber = student.getUsPhoneNumber();
     }
 
     // Getters and Setters
