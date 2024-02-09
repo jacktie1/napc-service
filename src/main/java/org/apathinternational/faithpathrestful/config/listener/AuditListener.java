@@ -14,6 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 
+/*
+ * This class is used to listen to the pre-insert and pre-update events of the hibernate
+ * and set the created and modified by and at fields of the entity.
+ */
 @Component
 public class AuditListener implements PreInsertEventListener, PreUpdateEventListener {
 

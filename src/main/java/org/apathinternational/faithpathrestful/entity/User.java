@@ -7,13 +7,17 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+
+import java.util.List;
 
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 
 @Entity
@@ -42,6 +46,9 @@ public class User extends AuditableEntity {
     @Column(name = "email_address", unique = true, nullable = false)
     private String emailAddress;
 
+    @Column(name = "gender")
+    private String gender;
+
     @Column(name = "enabled", nullable = false)
     @ColumnDefault("true") // "false" is the default value for "enabled"
     private Boolean enabled;
@@ -49,6 +56,9 @@ public class User extends AuditableEntity {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    List<UserSecurityQuestion> securityQuestions;
 
     // Constructors, getters, and setters
     public User() {
@@ -70,6 +80,10 @@ public class User extends AuditableEntity {
         return emailAddress;
     }
 
+    public String getGender() {
+        return gender;
+    }
+
     public Boolean getEnabled() {
         return enabled;
     }
@@ -86,6 +100,10 @@ public class User extends AuditableEntity {
         return lastName;
     }
 
+    public List<UserSecurityQuestion> getSecurityQuestions() {
+        return securityQuestions;
+    }
+
     public void setUsername(String username) {
     	this.username = username;
     }
@@ -96,6 +114,10 @@ public class User extends AuditableEntity {
 
     public void setEmailAddress(String emailAddress) {
     	this.emailAddress = emailAddress;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
     }
 
     public void setEnabled(Boolean enabled) {
@@ -112,6 +134,10 @@ public class User extends AuditableEntity {
 
     public void setLastName(String lastName) {
     	this.lastName = lastName;
+    }
+
+    public void setSecurityQuestions(List<UserSecurityQuestion> securityQuestions) {
+        this.securityQuestions = securityQuestions;
     }
 
     // toString, hashCode, equals...

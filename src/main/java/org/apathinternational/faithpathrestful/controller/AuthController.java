@@ -2,27 +2,19 @@ package org.apathinternational.faithpathrestful.controller;
 
 import org.apathinternational.faithpathrestful.security.DatabaseUserDetailsService;
 import org.apathinternational.faithpathrestful.security.JwtTokenProvider;
-import org.apathinternational.faithpathrestful.service.RoleService;
 import org.apathinternational.faithpathrestful.service.UserService;
-import org.apathinternational.faithpathrestful.model.request.SignupRequest;
 import org.apathinternational.faithpathrestful.model.response.LoginSuccessResponse;
-import org.apathinternational.faithpathrestful.model.response.SignupSuccessReponse;
-import org.apathinternational.faithpathrestful.entity.Role;
 import org.apathinternational.faithpathrestful.entity.User;
-import org.apathinternational.faithpathrestful.common.exception.ValidationException;
 import org.apathinternational.faithpathrestful.common.exception.BusinessException;
 import org.apathinternational.faithpathrestful.response.ResponseHandler;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -37,12 +29,6 @@ public class AuthController {
 
     @Autowired
     private UserService userService;
-
-    @Autowired
-    private RoleService roleService;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
 
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
@@ -67,34 +53,10 @@ public class AuthController {
         User authedUser = userService.getUserByUsername(userDetails.getUsername());
 
         String role = authedUser.getRole().getName();
+        Long userId = authedUser.getId();
         String firstName = authedUser.getFirstName();
         String lastName = authedUser.getLastName();
     
-        return ResponseHandler.generateResponse(new LoginSuccessResponse(token, role, firstName, lastName));
-    }
-
-    @PostMapping("/signup")
-    @ResponseStatus(code = HttpStatus.CREATED)
-    @Transactional
-    public ResponseEntity<?> register(@RequestBody SignupRequest request) {
-        User encrypted_user = new User();
-        encrypted_user.setUsername(request.getUsername());
-        encrypted_user.setEmailAddress(request.getEmailAddress());
-        encrypted_user.setPassword(passwordEncoder.encode(request.getPassword()));
-        encrypted_user.setFirstName(request.getFirstName());
-        encrypted_user.setLastName(request.getLastName());
-
-        Role role = roleService.getRoleByName(request.getRole());
-
-        if(role == null)
-        {
-            throw new ValidationException("Invalid role. Please check the role and try again.");
-        }
-
-        encrypted_user.setRole(role);
-        encrypted_user.setEnabled(true);
-        userService.createUser(encrypted_user);
-
-        return ResponseHandler.generateResponse(new SignupSuccessReponse("User created successfully."));
+        return ResponseHandler.generateResponse(new LoginSuccessResponse(token, userId, role, firstName, lastName));
     }
 }

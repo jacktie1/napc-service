@@ -2,6 +2,7 @@ package org.apathinternational.faithpathrestful.model.response;
 
 public class LoginSuccessResponse {
     private String token;
+    private Long userId;
     private String role;
     private String firstName;
     private String lastName;
@@ -9,11 +10,16 @@ public class LoginSuccessResponse {
     public LoginSuccessResponse() {
     }
 
-    public LoginSuccessResponse(String token, String role, String firstName, String lastName) {
+    public LoginSuccessResponse(String token, Long userId, String role, String firstName, String lastName) {
         this.token = token;
+        this.userId = userId;
         this.role = role;
         this.firstName = firstName;
         this.lastName = lastName;
+    }
+
+    public Long getUserId() {
+        return userId;
     }
 
     public String getToken() {
@@ -30,6 +36,10 @@ public class LoginSuccessResponse {
 
     public String getLastName() {
         return lastName;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public void setToken(String token) {

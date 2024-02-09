@@ -1,11 +1,7 @@
 package org.apathinternational.faithpathrestful.common.util;
 
-import java.util.ArrayList;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-
-import io.jsonwebtoken.security.Keys;
 
 import com.google.gson.GsonBuilder;
 
@@ -18,10 +14,8 @@ public class LoggingJsonFormatter {
         try {
             JsonElement parsedJson = gson.fromJson(jsonString, JsonElement.class);
 
-            ArrayList<String> keysToRedact = new ArrayList<String>();
-
             // password redaction
-            for (String keyToReact : this.keysToRedact) {
+            for (String keyToReact : keysToRedact) {
                 if (parsedJson.getAsJsonObject().has(keyToReact)) {
                     parsedJson.getAsJsonObject().remove(keyToReact);
                     parsedJson.getAsJsonObject().addProperty(keyToReact, "********");

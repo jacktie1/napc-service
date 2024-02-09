@@ -17,13 +17,10 @@ public class Reference extends AuditableEntity {
     @Id
     @Column(name = "reference_id", updatable = false, nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long referenceId;
+    private Long id;
 
     @Column(name = "reference_type", nullable = false)
     private String referenceType;
-
-    @Column(name = "key", nullable = false)
-    private String key;
 
     @Column(name = "value", nullable = false)
     private String value;
@@ -35,12 +32,12 @@ public class Reference extends AuditableEntity {
     @JoinColumn(name = "parent_reference_id")
     private Reference parentReference;
 
-    public Long getReferenceId() {
-        return referenceId;
+    public Long getId() {
+        return id;
     }
 
-    public void setReferenceId(Long referenceId) {
-        this.referenceId = referenceId;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getReferenceType() {
@@ -49,14 +46,6 @@ public class Reference extends AuditableEntity {
 
     public void setReferenceType(String referenceType) {
         this.referenceType = referenceType;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
     }
 
     public String getValue() {

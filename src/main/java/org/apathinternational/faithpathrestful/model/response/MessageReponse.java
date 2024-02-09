@@ -1,9 +1,9 @@
 package org.apathinternational.faithpathrestful.model.response;
 
-public class SignupSuccessReponse {
+public class MessageReponse {
     private String message;
 
-    public SignupSuccessReponse(String message) {
+    public MessageReponse(String message) {
         this.message = message;
     }
 
