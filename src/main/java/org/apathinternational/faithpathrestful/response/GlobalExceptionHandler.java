@@ -142,7 +142,7 @@ public class GlobalExceptionHandler {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("result", null);
         map.put("error", new ErrorResponse(Constants.ERROR_CODE_CUSTOM_ACCESS_DENIED_EXCEPTION, ex.getMessage()));
-        map.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
+        map.put("status", HttpStatus.FORBIDDEN.value());
         return new ResponseEntity<Object>(map, HttpStatus.FORBIDDEN);
     }
 }

@@ -29,13 +29,13 @@ class DatabaseUserDetailsPasswordService implements UserDetailsPasswordService {
 
         if(user == null)
         {
-            throw new UsernameNotFoundException("User not found with username: " + userDetails.getUsername());
+            throw new UsernameNotFoundException("User not found with id: " + userDetails.getUsername());
         }
 
         user.setPassword(newPassword);
         
         return new org.springframework.security.core.userdetails.User(
-                user.getUsername(),
+                user.getId().toString(),
                 user.getPassword(),
                 user.getEnabled(),
                 true,

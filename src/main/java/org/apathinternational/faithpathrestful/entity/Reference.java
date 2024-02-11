@@ -28,7 +28,7 @@ public class Reference extends AuditableEntity {
     @Column(name = "alternate_value")
     private String alternateValue;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "parent_reference_id")
     private Reference parentReference;
 

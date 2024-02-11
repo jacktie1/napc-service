@@ -2,6 +2,7 @@ package org.apathinternational.faithpathrestful.model.entityDTO;
 
 import org.apathinternational.faithpathrestful.entity.Student;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 
 public class StudentTempHousingDTO {
@@ -18,6 +19,7 @@ public class StudentTempHousingDTO {
 
     private String contactPhoneNumber;
 
+    @Email
     private String contactEmailAddress;
 
     public StudentTempHousingDTO() {

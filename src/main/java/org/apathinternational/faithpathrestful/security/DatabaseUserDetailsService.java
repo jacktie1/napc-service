@@ -22,15 +22,16 @@ public class DatabaseUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userService.getUserByUsername(username);
+        // The 'username' of UserDetails instance is actually the user id because username can change
+        User user = userService.getUserById(Long.parseLong(username));
 
         if(user == null)
         {
-            throw new UsernameNotFoundException("User not found with username: " + username);
+            throw new UsernameNotFoundException("User not found with id: " + username);
         }
 
         return new org.springframework.security.core.userdetails.User(
-                user.getUsername(),
+                user.getId().toString(),
                 user.getPassword(),
                 user.getEnabled(),
                 true,

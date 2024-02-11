@@ -1,9 +1,6 @@
 package org.apathinternational.faithpathrestful.entity;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
@@ -14,50 +11,50 @@ public abstract class AuditableEntity {
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at", updatable = false)
-    private Date created_at;
+    private Date createdAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "created_by")
-    private User created_by;
+    @Column(name = "created_by")
+    private Long createdBy;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "modified_at")
-    private Date modified_at;
+    private Date modifiedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "modified_by")
-    private User modified_by;
+    @Column(name = "modified_by")
+    private Long modifiedBy;
 
     // getters and setters
     public Date getCreatedAt() {
-        return created_at;
+        return createdAt;
     }
 
-    public void setCreatedAt(Date created_at) {
-        this.created_at = created_at;
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
     }
 
-    public User getCreatedBy() {
-        return created_by;
+    public Long getCreatedBy() {
+        return createdBy;
     }
 
-    public void setCreatedBy(User created_by) {
-        this.created_by = created_by;
+    public void setCreatedBy(Long createdBy) {
+        this.createdBy = createdBy;
     }
 
     public Date getModifiedAt() {
-        return modified_at;
+        return modifiedAt;
     }
 
-    public void setModifiedAt(Date modified_at) {
-        this.modified_at = modified_at;
+    public void setModifiedAt(Date modifiedAt) {
+        this.modifiedAt = modifiedAt;
     }
 
-    public User getModifiedBy() {
-        return modified_by;
+    public Long getModifiedBy() {
+        return modifiedBy;
     }
 
-    public void setModifiedBy(User modified_by) {
-        this.modified_by = modified_by;
+    public void setModifiedBy(Long modifiedBy) {
+        this.modifiedBy = modifiedBy;
     }
+
+
 }

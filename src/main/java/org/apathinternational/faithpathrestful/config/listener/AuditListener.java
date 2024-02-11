@@ -3,15 +3,17 @@ package org.apathinternational.faithpathrestful.config.listener;
 import java.util.Date;
 
 import org.apathinternational.faithpathrestful.entity.AuditableEntity;
-import org.apathinternational.faithpathrestful.entity.User;
 import org.apathinternational.faithpathrestful.service.SessionService;
 import org.apathinternational.faithpathrestful.service.UserService;
 import org.hibernate.event.spi.PreInsertEvent;
 import org.hibernate.event.spi.PreInsertEventListener;
 import org.hibernate.event.spi.PreUpdateEvent;
 import org.hibernate.event.spi.PreUpdateEventListener;
+import org.hibernate.persister.entity.EntityPersister;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import jakarta.persistence.FlushModeType;
 
 
 /*
@@ -29,25 +31,18 @@ public class AuditListener implements PreInsertEventListener, PreUpdateEventList
 
     @Override
     public boolean onPreInsert(PreInsertEvent event) {
-        User executor = sessionService.getAuthedUser();
+        Long executorId = sessionService.getAuthedUserId();
 
-        if(executor == null) {
-            executor = userService.getUserById(-1L);
+        if(executorId == null) {
+            executorId = -1L;
         }
 
-        if (event.getEntity() instanceof User) {
-            User entity = (User) event.getEntity();
-            entity.setCreatedAt(new Date());
-            entity.setCreatedBy(executor);
-            entity.setModifiedAt(new Date());
-            entity.setModifiedBy(executor);
-        }
-        else if (event.getEntity() instanceof AuditableEntity) {
+        if (event.getEntity() instanceof AuditableEntity) {
             AuditableEntity entity = (AuditableEntity) event.getEntity();
             entity.setCreatedAt(new Date());
-            entity.setCreatedBy(executor);
+            entity.setCreatedBy(executorId);
             entity.setModifiedAt(new Date());
-            entity.setModifiedBy(executor);
+            entity.setModifiedBy(executorId);
         }
 
         return false;
@@ -55,16 +50,23 @@ public class AuditListener implements PreInsertEventListener, PreUpdateEventList
 
     @Override
     public boolean onPreUpdate(PreUpdateEvent event) {
-        User executor = sessionService.getAuthedUser();
-
-        if(executor == null) {
-            executor = userService.getUserById(-1L);
+        Long executorId = sessionService.getAuthedUserId();
+        EntityPersister persister = event.getPersister();
+        
+        if(executorId == null) {
+            executorId = -1L;
         }
 
+        // Somehow setting the modifiedBy and modifiedAt fields of the entity is not working
         if (event.getEntity() instanceof AuditableEntity) {
-            AuditableEntity entity = (AuditableEntity) event.getEntity();
-            entity.setModifiedAt(new Date());
-            entity.setModifiedBy(executor);
+            String tableName = persister.getMappedTableDetails().getTableName();
+
+            event.getSession().createNativeQuery("UPDATE " + tableName + " SET modified_at = :modifiedAt, modified_by = :modifiedBy WHERE " + tableName + "_id = :id", Void.class)
+                .setParameter("modifiedAt", new Date())
+                .setParameter("modifiedBy", executorId)
+                .setParameter("id", event.getId())
+                .setFlushMode(FlushModeType.COMMIT)
+                .executeUpdate();
         }
 
         return false;

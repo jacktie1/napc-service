@@ -55,8 +55,13 @@ public class SecurityConfig {
 		http
             .csrf(csrf -> csrf.disable())
 			.authorizeHttpRequests((authorize) ->
+                // List all endpoints that don't need to be authenticated here
+                // The other endpoints will be authorized in each method using annotations like @PreAuthorize
                 authorize
-                    .requestMatchers("/api/**").permitAll() // authorizations will all be individually handled by the controllers
+                    .requestMatchers("/api/auth/login").permitAll()
+                    .requestMatchers("/api/admin/getReferences").permitAll()
+                    .requestMatchers("/api/admin/getManagement").permitAll()
+                    .requestMatchers("/api/student/register").permitAll()
                     .anyRequest().authenticated()
 			)
             .sessionManagement((sessionManagement) ->

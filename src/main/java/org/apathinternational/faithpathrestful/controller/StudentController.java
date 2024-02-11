@@ -15,6 +15,10 @@ import org.apathinternational.faithpathrestful.model.entityDTO.StudentProfileDTO
 import org.apathinternational.faithpathrestful.model.entityDTO.StudentTempHousingDTO;
 import org.apathinternational.faithpathrestful.model.entityDTO.UserAccountDTO;
 import org.apathinternational.faithpathrestful.model.request.RegisterStudentRequest;
+import org.apathinternational.faithpathrestful.model.request.UpdateStudentCommentRequest;
+import org.apathinternational.faithpathrestful.model.request.UpdateStudentFlightInfoRequest;
+import org.apathinternational.faithpathrestful.model.request.UpdateStudentProfileRequest;
+import org.apathinternational.faithpathrestful.model.request.UpdateStudentTempHousingRequest;
 import org.apathinternational.faithpathrestful.model.response.GetStudentResponse;
 import org.apathinternational.faithpathrestful.model.response.MessageReponse;
 import org.apathinternational.faithpathrestful.response.ResponseHandler;
@@ -30,6 +34,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -127,7 +132,6 @@ public class StudentController {
         studentUser.setContactEmailAddress(studentTempHousing.getContactEmailAddress());
         studentUser.setStudentComment(studentComment.getStudentComment());
         studentUser.setAdminComment(studentComment.getAdminComment());
-
 
         if(studentProfile.getMajorReferenceId() != null) {
             Reference majorReference = new Reference();
@@ -230,7 +234,7 @@ public class StudentController {
         User authedUser = sessionService.getAuthedUser();
 
         if(authedUser.isStudent() && !authedUser.getId().equals(userId)) {
-            throw new CustomAccessDeniedException("You are not authorized to view this profile.");
+            throw new CustomAccessDeniedException("You are not authorized to access this resource.");
         }
 
         Student student = studentService.getStudentByUserId(userId);
@@ -245,6 +249,199 @@ public class StudentController {
 
         return ResponseHandler.generateResponse(response);
     }
+
+    @GetMapping("/getAccount/{userId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STUDENT')")
+    public ResponseEntity<?> getAccount(@PathVariable(required=true, name="userId") Long userId) {
+        User authedUser = sessionService.getAuthedUser();
+
+        if(authedUser.isStudent() && !authedUser.getId().equals(userId)) {
+            throw new CustomAccessDeniedException("You are not authorized to access this resource.");
+        }
+
+        Student student = studentService.getStudentByUserId(userId);
+
+        if(student == null) {
+            throw new BusinessException("User is found but student data is missing.");
+        }
+
+        GetStudentResponse response = new GetStudentResponse();
+
+        response.setUserAccount(student);
+
+        return ResponseHandler.generateResponse(response);
+    }
+
+    @PutMapping("/updateProfile/{userId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STUDENT')")
+    @Transactional
+    public ResponseEntity<?> updateProfile(@PathVariable(required=true, name="userId") Long userId, @Valid @RequestBody UpdateStudentProfileRequest request) {
+        User authedUser = sessionService.getAuthedUser();
+
+        if(authedUser.isStudent() && !authedUser.getId().equals(userId)) {
+            throw new CustomAccessDeniedException("You are not authorized to modify this resource.");
+        }
+
+        StudentProfileDTO studentProfile = request.getStudentProfile();
+
+        Student student = studentService.getStudentByUserId(userId);
+
+        if(student == null) {
+            throw new BusinessException("User is found but student data is missing.");
+        }
+
+        User studentUser = student.getUser();
+
+        // changes will be automatically saved to the database because of the @Transactional annotation
+        studentUser.setFirstName(studentProfile.getFirstName());
+        studentUser.setLastName(studentProfile.getLastName());
+        studentUser.setGender(studentProfile.getGender());
+        studentUser.setEmailAddress(studentProfile.getEmailAddress());
+
+        student.setEnglishName(studentProfile.getEnglishName());
+        student.setIsNewStudent(studentProfile.getIsNewStudent());
+        student.setStudentType(studentProfile.getStudentType());
+        student.setGraduatesFrom(studentProfile.getGraduatesFrom());
+        student.setHasCompanion(studentProfile.getHasCompanion());
+        student.setWechatId(studentProfile.getWechatId());
+        student.setCnPhoneNumber(studentProfile.getCnPhoneNumber());
+        student.setUsPhoneNumber(studentProfile.getUsPhoneNumber());
+
+        if(studentProfile.getMajorReferenceId() != null) {
+            Reference majorReference = new Reference();
+            majorReference.setId(studentProfile.getMajorReferenceId());
+            student.setMajorReference(majorReference);
+            student.setCustomMajor(null);
+        } else if (studentProfile.getCustomMajor() != null) {
+            student.setMajorReference(null);
+            student.setCustomMajor(studentProfile.getCustomMajor());
+        }
+
+        return ResponseHandler.generateResponse(new MessageReponse("Profile updated successfully."));
+    }
     
+    
+    @PutMapping("/updateFlightInfo/{userId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STUDENT')")
+    @Transactional
+    public ResponseEntity<?> updateFlightInfo(@PathVariable(required=true, name="userId") Long userId, @Valid @RequestBody UpdateStudentFlightInfoRequest request) {
+        User authedUser = sessionService.getAuthedUser();
+
+        if(authedUser.isStudent() && !authedUser.getId().equals(userId)) {
+            throw new CustomAccessDeniedException("You are not authorized to modify this resource.");
+        }
+
+        StudentFlightInfoDTO studentFlightInfo = request.getStudentFlightInfo();
+
+        Student student = studentService.getStudentByUserId(userId);
+
+        if(student == null) {
+            throw new BusinessException("User is found but student data is missing.");
+        }
+
+        // changes will be automatically saved to the database because of the @Transactional annotation
+        student.setNeedsAirportPickup(studentFlightInfo.getNeedsAirportPickup());
+        student.setHasFlightInfo(studentFlightInfo.getHasFlightInfo());
+        student.setArrivalFlightNumber(studentFlightInfo.getArrivalFlightNumber());
+        student.setArrivalDatetime(studentFlightInfo.getArrivalDatetime());
+        student.setDepartureFlightNumber(studentFlightInfo.getDepartureFlightNumber());
+        student.setDepartureDatetime(studentFlightInfo.getDepartureDatetime());
+        student.setNumLgLuggages(studentFlightInfo.getNumLgLuggages());
+        student.setNumSmLuggages(studentFlightInfo.getNumSmLuggages());
+
+        if(studentFlightInfo.getArrivalAirlineReferenceId() != null) {
+            Reference arrivalAirlineReference = new Reference();
+            arrivalAirlineReference.setId(studentFlightInfo.getArrivalAirlineReferenceId());
+            student.setArrivalAirlineReference(arrivalAirlineReference);
+            student.setCustomArrivalAirline(null);
+        } else if (studentFlightInfo.getCustomArrivalAirline() != null) {
+            student.setArrivalAirlineReference(null);
+            student.setCustomArrivalAirline(studentFlightInfo.getCustomArrivalAirline());
+        }
+
+        if(studentFlightInfo.getDepartureAirlineReferenceId() != null) {
+            Reference departureAirlineReference = new Reference();
+            departureAirlineReference.setId(studentFlightInfo.getDepartureAirlineReferenceId());
+            student.setDepartureAirlineReference(departureAirlineReference);
+            student.setCustomDepartureAirline(null);
+        } else if (studentFlightInfo.getCustomDepartureAirline() != null) {
+            student.setDepartureAirlineReference(null);
+            student.setCustomDepartureAirline(studentFlightInfo.getCustomDepartureAirline());
+        }
+
+        return ResponseHandler.generateResponse(new MessageReponse("Flight info updated successfully."));
+    }
+
+    @PutMapping("/updateTempHousing/{userId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STUDENT')")
+    @Transactional
+    public ResponseEntity<?> updateTempHousing(@PathVariable(required=true, name="userId") Long userId, @Valid @RequestBody UpdateStudentTempHousingRequest request) {
+        User authedUser = sessionService.getAuthedUser();
+
+        if(authedUser.isStudent() && !authedUser.getId().equals(userId)) {
+            throw new CustomAccessDeniedException("You are not authorized to modify this resource.");
+        }
+
+        Student student = studentService.getStudentByUserId(userId);
+
+        if(student == null) {
+            throw new BusinessException("User is found but student data is missing.");
+        }
+
+        StudentTempHousingDTO studentTempHousing = request.getStudentTempHousing();
+
+        // changes will be automatically saved to the database because of the @Transactional annotation
+        student.setNeedsTempHousing(studentTempHousing.getNeedsTempHousing());
+        student.setNumNights(studentTempHousing.getNumNights());
+        student.setContactName(studentTempHousing.getContactName());
+        student.setContactPhoneNumber(studentTempHousing.getContactPhoneNumber());
+        student.setContactEmailAddress(studentTempHousing.getContactEmailAddress());
+
+        if(studentTempHousing.getApartmentReferenceId() != null) {
+            Reference apartmentReference = new Reference();
+            apartmentReference.setId(studentTempHousing.getApartmentReferenceId());
+            student.setApartmentReference(apartmentReference);
+            student.setCustomDestinationAddress(null);
+        } else if (studentTempHousing.getCustomDestinationAddress() != null) {
+            student.setApartmentReference(null);
+            student.setCustomDestinationAddress(studentTempHousing.getCustomDestinationAddress());
+        }
+
+        if(studentTempHousing.getApartmentReferenceId() != null) {
+            Reference apartmentReference = new Reference();
+            apartmentReference.setId(studentTempHousing.getApartmentReferenceId());
+            student.setApartmentReference(apartmentReference);
+        }
+
+        return ResponseHandler.generateResponse(new MessageReponse("Temp housing updated successfully."));
+    }
+
+    @PutMapping("/updateComment/{userId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STUDENT')")
+    @Transactional
+    public ResponseEntity<?> updateComment(@PathVariable(required=true, name="userId") Long userId, @Valid @RequestBody UpdateStudentCommentRequest request) {
+        User authedUser = sessionService.getAuthedUser();
+
+        if(authedUser.isStudent() && !authedUser.getId().equals(userId)) {
+            throw new CustomAccessDeniedException("You are not authorized to modify this resource.");
+        }
+
+        Student student = studentService.getStudentByUserId(userId);
+
+        if(student == null) {
+            throw new BusinessException("User is found but student data is missing.");
+        }
+
+        StudentCommentDTO studentComment = request.getStudentComment();
+
+        student.setStudentComment(studentComment.getStudentComment());
+
+        // Only admin can update the admin comment
+        if(authedUser.isAdmin()) {
+            student.setAdminComment(studentComment.getAdminComment());
+        }
+
+        return ResponseHandler.generateResponse(new MessageReponse("Comment updated successfully."));
+    }
     
 }

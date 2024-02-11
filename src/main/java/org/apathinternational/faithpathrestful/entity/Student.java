@@ -27,7 +27,7 @@ public class Student extends AuditableEntity {
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
@@ -71,7 +71,7 @@ public class Student extends AuditableEntity {
     @Column(name = "arrival_flight_number")
     private String arrivalFlightNumber;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "arrival_airline_reference_id")
     private Reference arrivalAirlineReference;
 
@@ -84,7 +84,7 @@ public class Student extends AuditableEntity {
     @Column(name = "departure_flight_number")
     private String departureFlightNumber;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "departure_airline_reference_id")
     private Reference departureAirlineReference;
 

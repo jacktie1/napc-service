@@ -94,6 +94,7 @@ CREATE TABLE IF NOT EXISTS `student` (
 CREATE TABLE IF NOT EXISTS `volunteer` (
     `volunteer_id` BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `user_id` BIGINT NOT NULL REFERENCES `user`(`user_id`) ON DELETE CASCADE,
+    `affiliation` VARCHAR(255) NOT NULL,
     `primary_phone_number` VARCHAR(255) NOT NULL,
     `secondary_phone_number` VARCHAR(255),
     `wechat_id` VARCHAR(255),
@@ -121,8 +122,8 @@ CREATE TABLE IF NOT EXISTS `volunteer` (
     CHECK ((provides_temp_housing is false) or (home_address is not null))
 );
 
-CREATE TABLE IF NOT EXISTS `adminstrator` (
-    `adminstrator_id` BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS `administrator` (
+    `administrator_id` BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `user_id` BIGINT NOT NULL REFERENCES `user`(`user_id`) ON DELETE CASCADE,
     `affiliation` VARCHAR(255) NOT NULL,
     `primary_phone_number` VARCHAR(255) NOT NULL,
@@ -171,7 +172,7 @@ CREATE TABLE IF NOT EXISTS `management` (
     `does_assignment_start` BOOLEAN NOT NULL,
     `student_registration_start_date` DATE NOT NULL,
     `student_registration_end_date` DATE NOT NULL,
-    `announcement` TEXT,
+    `announcement` TEXT NOT NULL,
     `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `created_by` BIGINT NOT NULL DEFAULT -1 REFERENCES `user`(`user_id`),
     `modified_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -227,7 +228,7 @@ VALUES
     true,
     '2024-01-01',
     '2024-12-31',
-    'Welcome to Apath International'
+    'This website is open for registration now, and is designed to help Georgia Tech NEW students from China.\n\nPLEASE DO NOT WRITE CHINESE IN ANY TEXT BOX AREA!!! IT WILL CREATE ERROR!\n\nNOTICE - There will be LIMITED temporary housing this year.'
 );
 
 -- Major Dropdowns

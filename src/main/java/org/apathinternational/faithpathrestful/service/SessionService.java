@@ -23,8 +23,28 @@ public class SessionService {
         }
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        String username = userDetails.getUsername();
+        String userId = userDetails.getUsername();
         
-        return userService.getUserByUsername(username);
+        return userService.getUserById(Long.parseLong(userId));
+    }
+
+    // This method is to get the currently logged in user
+    public Long getAuthedUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        // anonymous user
+        if(authentication.getPrincipal() instanceof String) {
+            return null;
+        }
+
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+
+        if(userDetails == null) {
+            return null;
+        }
+
+        String userId = userDetails.getUsername();
+        
+        return Long.parseLong(userId);
     }
 }

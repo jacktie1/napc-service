@@ -63,10 +63,10 @@ public class JwtTokenProvider {
 
     public UsernamePasswordAuthenticationToken getAuthentication(String token) {
         Claims claims = Jwts.parserBuilder().setSigningKey(Keys.hmacShaKeyFor(jwtSecret.getBytes())).build().parseClaimsJws(token).getBody();
-        String username = claims.getSubject();
+        String userId = claims.getSubject();
 
-        if (username != null) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        if (userId != null) {
+            UserDetails userDetails = userDetailsService.loadUserByUsername(userId);
             return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
         }
 
