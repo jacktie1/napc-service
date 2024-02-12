@@ -159,7 +159,7 @@ public class StudentController {
 
         studentService.createStudent(studentUser);
 
-        return ResponseHandler.generateResponse(new MessageReponse("User created successfully."));
+        return ResponseHandler.generateResponse(new MessageReponse("Student User created successfully."));
     }
 
     @GetMapping("/getProfile/{userId}")
@@ -246,28 +246,6 @@ public class StudentController {
         GetStudentResponse response = new GetStudentResponse();
 
         response.setStudentComment(student);
-
-        return ResponseHandler.generateResponse(response);
-    }
-
-    @GetMapping("/getAccount/{userId}")
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STUDENT')")
-    public ResponseEntity<?> getAccount(@PathVariable(required=true, name="userId") Long userId) {
-        User authedUser = sessionService.getAuthedUser();
-
-        if(authedUser.isStudent() && !authedUser.getId().equals(userId)) {
-            throw new CustomAccessDeniedException("You are not authorized to access this resource.");
-        }
-
-        Student student = studentService.getStudentByUserId(userId);
-
-        if(student == null) {
-            throw new BusinessException("User is found but student data is missing.");
-        }
-
-        GetStudentResponse response = new GetStudentResponse();
-
-        response.setUserAccount(student);
 
         return ResponseHandler.generateResponse(response);
     }

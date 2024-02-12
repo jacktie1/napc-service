@@ -1,7 +1,6 @@
 package org.apathinternational.faithpathrestful.service;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apathinternational.faithpathrestful.common.exception.BusinessException;
@@ -10,7 +9,6 @@ import org.apathinternational.faithpathrestful.entity.Reference;
 import org.apathinternational.faithpathrestful.entity.Role;
 import org.apathinternational.faithpathrestful.entity.Student;
 import org.apathinternational.faithpathrestful.entity.User;
-import org.apathinternational.faithpathrestful.entity.UserSecurityQuestion;
 import org.apathinternational.faithpathrestful.repository.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -108,36 +106,12 @@ public class StudentService {
             }
         }
 
-        List<UserSecurityQuestion> securityQuestions = studentUser.getSecurityQuestions();
-
-        for(UserSecurityQuestion securityQuestion : securityQuestions)
-        {
-            Reference securityQuestionReference = securityQuestion.getSecurityQuestionReference();
-
-            if(securityQuestionReference != null)
-            {
-                Reference savedSecurityQuestionReference = referenceService.findById(securityQuestionReference.getId());
-
-                if(savedSecurityQuestionReference != null)
-                {
-                    securityQuestion.setSecurityQuestionReference(savedSecurityQuestionReference);
-                }
-                else
-                {
-                    fieldErrors.put("securityQuestionReferenceId", "Invalid security question reference. Please check the security question reference and try again.");
-                }
-            }
-
-            securityQuestion.setUser(studentUser);
-        }
-
         if(!fieldErrors.isEmpty())
         {
             throw new ValidationException("Validation error(s) encountered during student creation", fieldErrors);
         }
 
         studentUser.setRole(role);
-        studentUser.setEnabled(true);
 
         User savedUser = userService.createUser(studentUser);
     

@@ -117,6 +117,14 @@ public class User extends AuditableEntity {
     public Student getStudent() {
         return student;
     }
+    
+    public Volunteer getVolunteer() {
+        return volunteer;
+    }
+
+    public Administrator getAdministrator() {
+        return administrator;
+    }
 
     public void setUsername(String username) {
     	this.username = username;
@@ -158,6 +166,15 @@ public class User extends AuditableEntity {
         this.student = student;
     }
 
+    public void setVolunteer(Volunteer volunteer) {
+        this.volunteer = volunteer;
+    }
+
+    public void setAdministrator(Administrator administrator) {
+        this.administrator = administrator;
+    }
+
+    // Custom methods
     public boolean isStudent() {
         return role.getName().equals("Student");
     }

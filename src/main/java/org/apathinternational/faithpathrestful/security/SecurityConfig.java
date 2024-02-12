@@ -62,6 +62,7 @@ public class SecurityConfig {
                     .requestMatchers("/api/admin/getReferences").permitAll()
                     .requestMatchers("/api/admin/getManagement").permitAll()
                     .requestMatchers("/api/student/register").permitAll()
+                    .requestMatchers("/api/volunteer/register").permitAll()
                     .anyRequest().authenticated()
 			)
             .sessionManagement((sessionManagement) ->

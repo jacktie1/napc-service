@@ -21,7 +21,7 @@ public class UserAccountDTO {
 
     @NotBlank
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Long securityQuestionReferenceUserId1;
+    private Long securityQuestionReferenceId1;
 
     @NotBlank
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -29,7 +29,7 @@ public class UserAccountDTO {
 
     @NotBlank
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Long securityQuestionReferenceUserId2;
+    private Long securityQuestionReferenceId2;
 
     @NotBlank
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -37,7 +37,7 @@ public class UserAccountDTO {
 
     @NotBlank
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Long securityQuestionReferenceUserId3;
+    private Long securityQuestionReferenceId3;
 
     @NotBlank
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -52,9 +52,9 @@ public class UserAccountDTO {
 
         List<UserSecurityQuestion> securityQuestions = user.getSecurityQuestions();
 
-        this.securityQuestionReferenceUserId1 = securityQuestions.get(0).getSecurityQuestionReference().getId();
-        this.securityQuestionReferenceUserId2 = securityQuestions.get(1).getSecurityQuestionReference().getId();
-        this.securityQuestionReferenceUserId3 = securityQuestions.get(2).getSecurityQuestionReference().getId();
+        this.securityQuestionReferenceId1 = securityQuestions.get(0).getSecurityQuestionReference().getId();
+        this.securityQuestionReferenceId2 = securityQuestions.get(1).getSecurityQuestionReference().getId();
+        this.securityQuestionReferenceId3 = securityQuestions.get(2).getSecurityQuestionReference().getId();
     }
 
     public Long getUserId() {
@@ -70,7 +70,7 @@ public class UserAccountDTO {
     }
 
     public Long getSecurityQuestionReferenceId1() {
-        return securityQuestionReferenceUserId1;
+        return securityQuestionReferenceId1;
     }
 
     public String getsecurityAnswer1() {
@@ -78,7 +78,7 @@ public class UserAccountDTO {
     }
 
     public Long getSecurityQuestionReferenceId2() {
-        return securityQuestionReferenceUserId2;
+        return securityQuestionReferenceId2;
     }
 
     public String getsecurityAnswer2() {
@@ -86,7 +86,7 @@ public class UserAccountDTO {
     }
 
     public Long getSecurityQuestionReferenceId3() {
-        return securityQuestionReferenceUserId3;
+        return securityQuestionReferenceId3;
     }
 
     public String getsecurityAnswer3() {
@@ -105,24 +105,24 @@ public class UserAccountDTO {
         this.password = password;
     }
 
-    public void setSecurityQuestionReferenceId1(Long securityQuestionReferenceUserId1) {
-        this.securityQuestionReferenceUserId1 = securityQuestionReferenceUserId1;
+    public void setSecurityQuestionReferenceId1(Long securityQuestionReferenceId1) {
+        this.securityQuestionReferenceId1 = securityQuestionReferenceId1;
     }
 
     public void setsecurityAnswer1(String securityAnswer1) {
         this.securityAnswer1 = securityAnswer1;
     }
 
-    public void setSecurityQuestionReferenceId2(Long securityQuestionReferenceUserId2) {
-        this.securityQuestionReferenceUserId2 = securityQuestionReferenceUserId2;
+    public void setSecurityQuestionReferenceId2(Long securityQuestionReferenceId2) {
+        this.securityQuestionReferenceId2 = securityQuestionReferenceId2;
     }
 
     public void setsecurityAnswer2(String securityAnswer2) {
         this.securityAnswer2 = securityAnswer2;
     }
 
-    public void setSecurityQuestionReferenceId3(Long securityQuestionReferenceUserId3) {
-        this.securityQuestionReferenceUserId3 = securityQuestionReferenceUserId3;
+    public void setSecurityQuestionReferenceId3(Long securityQuestionReferenceId3) {
+        this.securityQuestionReferenceId3 = securityQuestionReferenceId3;
     }
 
     public void setsecurityAnswer3(String securityAnswer3) {

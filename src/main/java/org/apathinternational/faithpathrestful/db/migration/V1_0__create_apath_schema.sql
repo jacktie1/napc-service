@@ -113,7 +113,7 @@ CREATE TABLE IF NOT EXISTS `volunteer` (
     `num_double_beds` INTEGER,
     `num_single_beds` INTEGER,
     `gender_preference` VARCHAR(255),
-    `provides_rides` BOOLEAN NOT NULL,
+    `provides_ride` BOOLEAN,
     `temp_housing_comment` TEXT,
     `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `created_by` BIGINT NOT NULL DEFAULT -1 REFERENCES `user`(`user_id`),

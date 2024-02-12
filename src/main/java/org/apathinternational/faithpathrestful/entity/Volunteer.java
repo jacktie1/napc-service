@@ -86,8 +86,11 @@ public class Volunteer extends AuditableEntity {
     @Column(name = "gender_preference")
     private String genderPreference;
 
-    @Column(name = "provides_rides", nullable = false)
-    private Boolean providesRides;
+    @Column(name = "provides_ride")
+    private Boolean providesRide;
+
+    @Column(name = "temp_housing_comment")
+    private String tempHousingComment;
 
     public Volunteer() {
     }
@@ -98,6 +101,10 @@ public class Volunteer extends AuditableEntity {
 
     public User getUser() {
         return user;
+    }
+
+    public String getAffiliation() {
+        return affiliation;
     }
 
     public String getPrimaryPhoneNumber() {
@@ -172,12 +179,20 @@ public class Volunteer extends AuditableEntity {
         return genderPreference;
     }
 
-    public Boolean getProvidesRides() {
-        return providesRides;
+    public Boolean getProvidesRide() {
+        return providesRide;
+    }
+
+    public String getTempHousingComment() {
+        return tempHousingComment;
     }
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public void setAffiliation(String affiliation) {
+        this.affiliation = affiliation;
     }
 
     public void setPrimaryPhoneNumber(String primaryPhoneNumber) {
@@ -252,8 +267,12 @@ public class Volunteer extends AuditableEntity {
         this.genderPreference = genderPreference;
     }
 
-    public void setProvidesRides(Boolean providesRides) {
-        this.providesRides = providesRides;
+    public void setProvidesRide(Boolean providesRides) {
+        this.providesRide = providesRides;
+    }
+
+    public void setTempHousingComment(String tempHousingComment) {
+        this.tempHousingComment = tempHousingComment;
     }
 
 }
