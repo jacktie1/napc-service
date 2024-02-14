@@ -7,12 +7,14 @@ import org.apathinternational.faithpathrestful.entity.UserSecurityQuestion;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 
 public class UserAccountDTO {
     private Long userId;
 
     @NotBlank
+    @Min(8)
     private String username;
 
     @NotBlank
@@ -52,9 +54,20 @@ public class UserAccountDTO {
 
         List<UserSecurityQuestion> securityQuestions = user.getSecurityQuestions();
 
-        this.securityQuestionReferenceId1 = securityQuestions.get(0).getSecurityQuestionReference().getId();
-        this.securityQuestionReferenceId2 = securityQuestions.get(1).getSecurityQuestionReference().getId();
-        this.securityQuestionReferenceId3 = securityQuestions.get(2).getSecurityQuestionReference().getId();
+        if(securityQuestions.size() >= 1)
+        {
+            this.securityQuestionReferenceId1 = securityQuestions.get(0).getSecurityQuestionReference().getId();
+        }
+
+        if(securityQuestions.size() >= 2)
+        {
+            this.securityQuestionReferenceId2 = securityQuestions.get(1).getSecurityQuestionReference().getId();
+        }
+
+        if(securityQuestions.size() >= 3)
+        {
+            this.securityQuestionReferenceId3 = securityQuestions.get(2).getSecurityQuestionReference().getId();
+        }
     }
 
     public Long getUserId() {

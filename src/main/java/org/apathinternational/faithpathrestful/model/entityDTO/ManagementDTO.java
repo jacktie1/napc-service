@@ -4,12 +4,23 @@ import java.time.LocalDate;
 
 import org.apathinternational.faithpathrestful.entity.Management;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 
 public class ManagementDTO {
     private Long managementId;
+
+    @NotNull
     private Boolean doesAssignmentStart;
+
+    @NotNull
     private LocalDate studentRegistrationStartDate;
+
+    @NotNull
     private LocalDate studentRegistrationEndDate;
+
+    @NotBlank
     private String announcement;
 
     public ManagementDTO() {

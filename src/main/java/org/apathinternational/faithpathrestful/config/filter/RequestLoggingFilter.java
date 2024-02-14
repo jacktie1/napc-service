@@ -25,9 +25,22 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
   
     private String getContentAsString(byte[] buf, int maxLength, String charsetName) {
       if (buf == null || buf.length == 0) return "";
-      int length = Math.min(buf.length, this.maxPayloadLength);
+
+      String payload;
+
+      try{
+        payload = jsonFormatter.format(new String(buf, 0, buf.length, charsetName));
+      } catch (UnsupportedEncodingException ex) {
+        return "Unsupported Encoding";
+      }
+    
+      // conver payload back to byte array
+      byte[] newBuf = payload.getBytes();
+      
+      int length = Math.min(newBuf.length, this.maxPayloadLength);
+
       try {
-        return new String(buf, 0, length, charsetName);
+        return new String(newBuf, 0, length, charsetName);
       } catch (UnsupportedEncodingException ex) {
         return "Unsupported Encoding";
       }
@@ -81,7 +94,7 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
       String requestBody = this.getContentAsString(wrappedRequest.getContentAsByteArray(), this.maxPayloadLength, request.getCharacterEncoding());
       if (requestBody.length() > 0)
       {
-        logger.info(reqInfo + ", body=" + jsonFormatter.format(requestBody) + ", duration=" + duration + "ms");
+        logger.info(reqInfo + ", body=" + requestBody + ", duration=" + duration + "ms");
       }
       else
       {
@@ -97,7 +110,7 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
         .append("[TransId: ").append(transId).append("] ")
         .append("Response Details: ")
         .append("statusCode=" + response.getStatus())
-        .append(", body=" + jsonFormatter.format(responsePayload));
+        .append(", body=" + responsePayload);
    
         logger.info(respInfo.toString());
       }

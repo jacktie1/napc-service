@@ -33,11 +33,6 @@ public class StudentService {
 
         User studentUser = student.getUser();
 
-        if(userService.getUserByUsername(studentUser.getUsername()) != null)
-        {
-            throw new BusinessException("Username already exists. Please choose a different username and try again.");
-        }
-
         Role role = roleService.getRoleByName("Student");
 
         if(role == null)

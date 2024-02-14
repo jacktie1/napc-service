@@ -72,6 +72,12 @@ public class UserAccountController {
             throw new BusinessException("User not found.");
         }
 
+        User userByUserName = userService.getUserByUsername(request.getUserAccount().getUsername());
+
+        if(userByUserName != null && !userByUserName.getId().equals(userId)) {
+            throw new BusinessException("Username already exists. Please choose a different username and try again.");
+        }
+
         UserAccountDTO userAccount = request.getUserAccount();
 
         if(userAccount.getUsername() != null) {

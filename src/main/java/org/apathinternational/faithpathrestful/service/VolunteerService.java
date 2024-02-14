@@ -29,11 +29,6 @@ public class VolunteerService {
 
         User volunteerUser = volunteer.getUser();
 
-        if(userService.getUserByUsername(volunteerUser.getUsername()) != null)
-        {
-            throw new BusinessException("Username already exists. Please choose a different username and try again.");
-        }
-
         Role role = roleService.getRoleByName("Volunteer");
 
         if(role == null)

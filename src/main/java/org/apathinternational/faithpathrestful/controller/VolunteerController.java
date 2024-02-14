@@ -14,7 +14,9 @@ import org.apathinternational.faithpathrestful.model.entityDTO.VolunteerAirportP
 import org.apathinternational.faithpathrestful.model.entityDTO.VolunteerProfileDTO;
 import org.apathinternational.faithpathrestful.model.entityDTO.VolunteerTempHousingDTO;
 import org.apathinternational.faithpathrestful.model.request.RegisterVolunteerRequest;
+import org.apathinternational.faithpathrestful.model.request.UpdateVolunteerAirportPickupRequest;
 import org.apathinternational.faithpathrestful.model.request.UpdateVolunteerProfileRequest;
+import org.apathinternational.faithpathrestful.model.request.UpdateVolunteerTempHousingRequest;
 import org.apathinternational.faithpathrestful.model.response.GetVolunteerResponse;
 import org.apathinternational.faithpathrestful.model.response.MessageReponse;
 import org.apathinternational.faithpathrestful.response.ResponseHandler;
@@ -134,13 +136,13 @@ public class VolunteerController {
         User authedUser = sessionService.getAuthedUser();
 
         if(authedUser.isVolunteer() && !authedUser.getId().equals(userId)) {
-            throw new CustomAccessDeniedException("You are not authorized to view this student.");
+            throw new CustomAccessDeniedException("You are not authorized to view this volunteer.");
         }
 
         Volunteer volunteer = volunteerService.getVolunteerByUserId(userId);
 
         if(volunteer == null) {
-            throw new BusinessException("User is found but student data is missing.");
+            throw new BusinessException("User is found but volunteer data is missing.");
         }
 
         GetVolunteerResponse response = new GetVolunteerResponse();
@@ -156,13 +158,13 @@ public class VolunteerController {
         User authedUser = sessionService.getAuthedUser();
 
         if(authedUser.isVolunteer() && !authedUser.getId().equals(userId)) {
-            throw new CustomAccessDeniedException("You are not authorized to view this student.");
+            throw new CustomAccessDeniedException("You are not authorized to view this volunteer.");
         }
 
         Volunteer volunteer = volunteerService.getVolunteerByUserId(userId);
 
         if(volunteer == null) {
-            throw new BusinessException("User is found but student data is missing.");
+            throw new BusinessException("User is found but volunteer data is missing.");
         }
 
         GetVolunteerResponse response = new GetVolunteerResponse();
@@ -178,13 +180,13 @@ public class VolunteerController {
         User authedUser = sessionService.getAuthedUser();
 
         if(authedUser.isVolunteer() && !authedUser.getId().equals(userId)) {
-            throw new CustomAccessDeniedException("You are not authorized to view this student.");
+            throw new CustomAccessDeniedException("You are not authorized to view this volunteer.");
         }
 
         Volunteer volunteer = volunteerService.getVolunteerByUserId(userId);
 
         if(volunteer == null) {
-            throw new BusinessException("User is found but student data is missing.");
+            throw new BusinessException("User is found but volunteer data is missing.");
         }
 
         GetVolunteerResponse response = new GetVolunteerResponse();
@@ -227,5 +229,69 @@ public class VolunteerController {
 
         return ResponseHandler.generateResponse(new MessageReponse("Profile updated successfully."));
     }
+
+    @PutMapping("/updateAirportPickup/{userId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_VOLUNTEER')")
+    @Transactional
+    public ResponseEntity<?> updateAirportPickup(@PathVariable(required=true, name="userId") Long userId, @Valid @RequestBody UpdateVolunteerAirportPickupRequest request) {
+        User authedUser = sessionService.getAuthedUser();
+
+        if(authedUser.isVolunteer() && !authedUser.getId().equals(userId)) {
+            throw new CustomAccessDeniedException("You are not authorized to modify this resource.");
+        }
+
+        VolunteerAirportPickupDTO VolunteerAirportPickup = request.getVolunteerAirportPickup();
+
+        Volunteer volunteer = volunteerService.getVolunteerByUserId(userId);
+
+        if(volunteer == null) {
+            throw new BusinessException("User is found but volunteer data is missing.");
+        }
+
+        // changes will be automatically saved to the database because of the @Transactional annotation
+        volunteer.setProvidesAirportPickup(VolunteerAirportPickup.getProvidesAirportPickup());
+        volunteer.setCarManufacturer(VolunteerAirportPickup.getCarManufacturer());
+        volunteer.setCarModel(VolunteerAirportPickup.getCarModel());
+        volunteer.setNumCarSeats(VolunteerAirportPickup.getNumCarSeats());
+        volunteer.setNumMaxLgLuggages(VolunteerAirportPickup.getNumMaxLgLuggages());
+        volunteer.setNumMaxTrips(VolunteerAirportPickup.getNumMaxTrips());
+        volunteer.setAirportPickupComment(VolunteerAirportPickup.getAirportPickupComment());
+
+        return ResponseHandler.generateResponse(new MessageReponse("AirportPickup updated successfully."));
+    }
+
+    @PutMapping("/updateTempHousing/{userId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_VOLUNTEER')")
+    @Transactional
+    public ResponseEntity<?> updateTempHousing(@PathVariable(required=true, name="userId") Long userId, @Valid @RequestBody UpdateVolunteerTempHousingRequest request) {
+        User authedUser = sessionService.getAuthedUser();
+
+        if(authedUser.isVolunteer() && !authedUser.getId().equals(userId)) {
+            throw new CustomAccessDeniedException("You are not authorized to modify this resource.");
+        }
+
+        VolunteerTempHousingDTO VolunteerTempHousing = request.getVolunteerTempHousing();
+
+        Volunteer volunteer = volunteerService.getVolunteerByUserId(userId);
+
+        if(volunteer == null) {
+            throw new BusinessException("User is found but volunteer data is missing.");
+        }
+
+        // changes will be automatically saved to the database because of the @Transactional annotation
+        volunteer.setProvidesTempHousing(VolunteerTempHousing.getProvidesTempHousing());
+        volunteer.setHomeAddress(VolunteerTempHousing.getHomeAddress());
+        volunteer.setNumMaxStudentsHosted(VolunteerTempHousing.getNumMaxStudentsHosted());
+        volunteer.setTempHousingStartDate(VolunteerTempHousing.getTempHousingStartDate());
+        volunteer.setTempHousingEndDate(VolunteerTempHousing.getTempHousingEndDate());
+        volunteer.setNumDoubleBeds(VolunteerTempHousing.getNumDoubleBeds());
+        volunteer.setNumSingleBeds(VolunteerTempHousing.getNumSingleBeds());
+        volunteer.setGenderPreference(VolunteerTempHousing.getGenderPreference());
+        volunteer.setProvidesRide(VolunteerTempHousing.getProvidesRide());
+        volunteer.setTempHousingComment(VolunteerTempHousing.getTempHousingComment());
+
+        return ResponseHandler.generateResponse(new MessageReponse("TempHousing updated successfully."));
+    }
+
 
 }

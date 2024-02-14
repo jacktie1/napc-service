@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.apathinternational.faithpathrestful.common.exception.ValidationException;
 import org.apathinternational.faithpathrestful.entity.Reference;
 import org.apathinternational.faithpathrestful.entity.User;
 import org.apathinternational.faithpathrestful.entity.UserSecurityQuestion;
@@ -34,6 +35,16 @@ public class UserService {
     public User createUser(User user) {
         Map<String, String> fieldErrors = new HashMap<String, String>();
 
+        if(user.getUsername() != null)
+        {
+            User existingUser = getUserByUsername(user.getUsername());
+
+            if(existingUser != null)
+            {
+                fieldErrors.put("username", "Username already exists. Please choose a different username.");
+            }
+        }
+
         // New user is enabled by default
         if(user.getEnabled() == null)
         {
@@ -61,6 +72,11 @@ public class UserService {
             }
 
             securityQuestion.setUser(user);
+        }
+
+        if(!fieldErrors.isEmpty())
+        {
+            throw new ValidationException("Validation error(s) encountered during volunteer creation", fieldErrors);
         }
 
         return userRepository.save(user);
