@@ -1,6 +1,7 @@
 package org.apathinternational.faithpathrestful.service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apathinternational.faithpathrestful.common.exception.BusinessException;
@@ -115,6 +116,10 @@ public class StudentService {
         return studentRepository.save(student);
     }
 
+    public List<Student> getAllStudents() {
+        return studentRepository.findAll();
+    }
+
     public Student getStudentByUserId(Long userId) {
         User studentUser = userService.getUserById(userId);
 
@@ -131,5 +136,9 @@ public class StudentService {
         {
             throw new BusinessException("User is not a student. Please check the user and try again.");
         }
+    }
+
+    public void deleteStudents(List<Long> studentIds) {
+        studentRepository.deleteAllById(studentIds);
     }
 }

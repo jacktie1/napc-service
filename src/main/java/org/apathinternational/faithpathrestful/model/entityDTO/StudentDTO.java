@@ -1,5 +1,7 @@
 package org.apathinternational.faithpathrestful.model.entityDTO;
 
+import java.util.Date;
+
 import org.apathinternational.faithpathrestful.entity.Student;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -23,6 +25,9 @@ public class StudentDTO {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private StudentCommentDTO studentComment;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Date modifiedAt;
+
     public StudentDTO() {
     }
 
@@ -33,6 +38,16 @@ public class StudentDTO {
         this.studentFlightInfo = new StudentFlightInfoDTO(student);
         this.studentTempHousing = new StudentTempHousingDTO(student);
         this.studentComment = new StudentCommentDTO(student);
+
+        Date studentModifiedAt = student.getModifiedAt();
+        Date userModifiedAt = student.getUser().getModifiedAt();
+
+        // Set the modifiedAt to the latest modifiedAt
+        if (studentModifiedAt.after(userModifiedAt)) {
+            this.modifiedAt = studentModifiedAt;
+        } else {
+            this.modifiedAt = userModifiedAt;
+        }
     }
 
     public Long getStudentId() {
@@ -59,6 +74,10 @@ public class StudentDTO {
         return studentComment;
     }
 
+    public Date getModifiedAt() {
+        return modifiedAt;
+    }
+
     public void setStudentId(Long studentId) {
         this.studentId = studentId;
     }
@@ -81,6 +100,10 @@ public class StudentDTO {
 
     public void setStudentComment(StudentCommentDTO studentComment) {
         this.studentComment = studentComment;
+    }
+
+    public void setModifiedAt(Date modifiedAt) {
+        this.modifiedAt = modifiedAt;
     }
 
     public void setUserAccount(Student student) {

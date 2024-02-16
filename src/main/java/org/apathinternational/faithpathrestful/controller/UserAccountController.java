@@ -4,10 +4,14 @@ package org.apathinternational.faithpathrestful.controller;
 import org.apathinternational.faithpathrestful.service.SessionService;
 import org.apathinternational.faithpathrestful.service.UserService;
 import org.apathinternational.faithpathrestful.model.entityDTO.UserAccountDTO;
+import org.apathinternational.faithpathrestful.model.request.DeletesUsersRequest;
 import org.apathinternational.faithpathrestful.model.request.UpdateUserAccountRequest;
 import org.apathinternational.faithpathrestful.model.response.GetUserAccountResponse;
 import org.apathinternational.faithpathrestful.model.response.MessageReponse;
 import org.apathinternational.faithpathrestful.entity.User;
+
+import java.util.List;
+
 import org.apathinternational.faithpathrestful.common.exception.BusinessException;
 import org.apathinternational.faithpathrestful.common.exception.CustomAccessDeniedException;
 import org.apathinternational.faithpathrestful.response.ResponseHandler;
@@ -89,6 +93,17 @@ public class UserAccountController {
         }
 
         return ResponseHandler.generateResponse(new MessageReponse("Account updated successfully."));
+    }
+
+    @DeleteMapping("/deleteUsers")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @Transactional
+    public ResponseEntity<?> deleteUserAccounts(@RequestBody DeletesUsersRequest request) {
+        List<Long> userIds = request.getUserIds();
+
+        userService.deleteUsers(userIds);
+
+        return ResponseHandler.generateResponse(new MessageReponse("User(s) deleted successfully."));
     }
 
 }

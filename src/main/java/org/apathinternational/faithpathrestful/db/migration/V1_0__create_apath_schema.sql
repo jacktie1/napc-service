@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS `role` (
     `name` VARCHAR(255) UNIQUE NOT NULL
 );
 
+
 CREATE TABLE IF NOT EXISTS `user` (
     `user_id` BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `username` VARCHAR(255) UNIQUE NOT NULL,
@@ -14,33 +15,56 @@ CREATE TABLE IF NOT EXISTS `user` (
     `last_name` VARCHAR(255) NOT NULL,
     `gender` VARCHAR(255),
     `enabled` BOOLEAN NOT NULL DEFAULT true,
-    `role_id` BIGINT NOT NULL REFERENCES `role`(`role_id`),
+    `role_id` BIGINT NOT NULL,
     `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `created_by` BIGINT NOT NULL DEFAULT -1 REFERENCES `user`(`user_id`),
+    `created_by` BIGINT NOT NULL DEFAULT -1,
     `modified_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `modified_by` BIGINT NOT NULL DEFAULT -1 REFERENCES `user`(`user_id`),
-    CHECK ((`gender` is not null) or (`username` = 'system-process'))
+    `modified_by` BIGINT NOT NULL DEFAULT -1,
+    CHECK ((`gender` is not null) or (`username` = 'system-process')),
+    CONSTRAINT `fk_user_role_id` FOREIGN KEY (`role_id`) REFERENCES `role`(`role_id`),
+    CONSTRAINT `fk_user_created_by` FOREIGN KEY (`created_by`) REFERENCES `user`(`user_id`),
+    CONSTRAINT `fk_user_modified_by` FOREIGN KEY (`modified_by`) REFERENCES `user`(`user_id`)
 );
+
+CREATE TABLE IF NOT EXISTS `reference` (
+    `reference_id` BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `reference_type` VARCHAR(255) NOT NULL,
+    `value` VARCHAR(255) NOT NULL,
+    `alternate_value` VARCHAR(255),
+    `parent_reference_id` BIGINT,
+    `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `created_by` BIGINT NOT NULL DEFAULT -1,
+    `modified_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `modified_by` BIGINT NOT NULL DEFAULT -1,
+    CONSTRAINT `fk_reference_parent_reference_id` FOREIGN KEY (`parent_reference_id`) REFERENCES `reference`(`reference_id`),
+    CONSTRAINT `fk_reference_created_by` FOREIGN KEY (`created_by`) REFERENCES `user`(`user_id`),
+    CONSTRAINT `fk_reference_modified_by` FOREIGN KEY (`modified_by`) REFERENCES `user`(`user_id`)
+);
+
 
 CREATE TABLE IF NOT EXISTS `user_security_question` (
     `user_security_question_id` BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    `user_id` BIGINT NOT NULL REFERENCES `user`(`user_id`) ON DELETE CASCADE,
-    `security_question_reference_id` BIGINT NOT NULL REFERENCES `reference`(`reference_id`),
+    `user_id` BIGINT NOT NULL,
+    `security_question_reference_id` BIGINT NOT NULL,
     `security_answer` VARCHAR(255) NOT NULL,
     `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `created_by` BIGINT NOT NULL DEFAULT -1 REFERENCES `user`(`user_id`),
     `modified_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `modified_by` BIGINT NOT NULL DEFAULT -1 REFERENCES `user`(`user_id`)
+    `modified_by` BIGINT NOT NULL DEFAULT -1 REFERENCES `user`(`user_id`),
+    CONSTRAINT `fk_user_security_question_user_id` FOREIGN KEY (`user_id`) REFERENCES `user`(`user_id`) ON DELETE CASCADE,
+    constraint `fk_user_security_question_reference_id` foreign key (`security_question_reference_id`) references `reference`(`reference_id`),
+    CONSTRAINT `fk_user_security_question_created_by` FOREIGN KEY (`created_by`) REFERENCES `user`(`user_id`),
+    CONSTRAINT `fk_user_security_question_modified_by` FOREIGN KEY (`modified_by`) REFERENCES `user`(`user_id`)
 );
 
 CREATE TABLE IF NOT EXISTS `student` (
     `student_id` BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    `user_id` BIGINT NOT NULL REFERENCES `user`(`user_id`) ON DELETE CASCADE,
+    `user_id` BIGINT NOT NULL,
     `english_name` VARCHAR(255),
     `is_new_student` BOOLEAN NOT NULL,
     `student_type` VARCHAR(255) NOT NULL,
     `graduates_from` VARCHAR(255),
-    `major_reference_id` BIGINT REFERENCES `reference`(`reference_id`),
+    `major_reference_id` BIGINT,
     `custom_major` VARCHAR(255),
     `has_companion` BOOLEAN NOT NULL,
     `wechat_id` VARCHAR(255) NOT NULL,
@@ -49,18 +73,18 @@ CREATE TABLE IF NOT EXISTS `student` (
     `needs_airport_pickup` BOOLEAN NOT NULL,
     `has_flight_information` BOOLEAN,
     `arrival_flight_number` VARCHAR(255),
-    `arrival_airline_reference_id` BIGINT REFERENCES `reference`(`reference_id`),
+    `arrival_airline_reference_id` BIGINT,
     `custom_arrival_airline` VARCHAR(255),
     `arrival_datetime` DATETIME,
     `departure_flight_number` VARCHAR(255),
-    `departure_airline_reference_id` BIGINT REFERENCES `reference`(`reference_id`),
+    `departure_airline_reference_id` BIGINT,
     `custom_departure_airline` VARCHAR(255),
     `departure_datetime` DATETIME,
     `num_lg_luggages` INTEGER,
     `num_sm_luggages` INTEGER,
     `needs_temp_housing` BOOLEAN NOT NULL,
     `num_nights` INTEGER,
-    `apartment_reference_id` BIGINT REFERENCES `reference`(`reference_id`),
+    `apartment_reference_id` BIGINT,
     `custom_destination_address` VARCHAR(255),
     `contact_name` VARCHAR(255),
     `contact_phone_number` VARCHAR(255),
@@ -68,9 +92,9 @@ CREATE TABLE IF NOT EXISTS `student` (
     `student_comment` TEXT,
     `admin_comment` TEXT,
     `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `created_by` BIGINT NOT NULL DEFAULT -1 REFERENCES `user`(`user_id`),
+    `created_by` BIGINT NOT NULL DEFAULT -1,
     `modified_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `modified_by` BIGINT NOT NULL DEFAULT -1 REFERENCES `user`(`user_id`),
+    `modified_by` BIGINT NOT NULL DEFAULT -1,
     CHECK ((major_reference_id is null) != (custom_major is null)),
     CHECK ((apartment_reference_id is null) != (custom_destination_address is null)),
     CHECK ((needs_airport_pickup is false) or (has_flight_information is not null)),
@@ -88,12 +112,19 @@ CREATE TABLE IF NOT EXISTS `student` (
             and (num_sm_luggages is not null)
         )
     ),
-    CHECK ((needs_temp_housing is false) or (num_nights is not null))
+    CHECK ((needs_temp_housing is false) or (num_nights is not null)),
+    CONSTRAINT `fk_student_user_id` FOREIGN KEY (`user_id`) REFERENCES `user`(`user_id`) ON DELETE CASCADE,
+    CONSTRAINT `fk_student_major_reference_id` FOREIGN KEY (`major_reference_id`) REFERENCES `reference`(`reference_id`),
+    CONSTRAINT `fk_student_apartment_reference_id` FOREIGN KEY (`apartment_reference_id`) REFERENCES `reference`(`reference_id`),
+    CONSTRAINT `fk_student_arrival_airline_reference_id` FOREIGN KEY (`arrival_airline_reference_id`) REFERENCES `reference`(`reference_id`),
+    CONSTRAINT `fk_student_departure_airline_reference_id` FOREIGN KEY (`departure_airline_reference_id`) REFERENCES `reference`(`reference_id`),
+    CONSTRAINT `fk_student_created_by` FOREIGN KEY (`created_by`) REFERENCES `user`(`user_id`),
+    CONSTRAINT `fk_student_modified_by` FOREIGN KEY (`modified_by`) REFERENCES `user`(`user_id`)
 );
 
 CREATE TABLE IF NOT EXISTS `volunteer` (
     `volunteer_id` BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    `user_id` BIGINT NOT NULL REFERENCES `user`(`user_id`) ON DELETE CASCADE,
+    `user_id` BIGINT NOT NULL,
     `affiliation` VARCHAR(255) NOT NULL,
     `primary_phone_number` VARCHAR(255) NOT NULL,
     `secondary_phone_number` VARCHAR(255),
@@ -116,54 +147,72 @@ CREATE TABLE IF NOT EXISTS `volunteer` (
     `provides_ride` BOOLEAN,
     `temp_housing_comment` TEXT,
     `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `created_by` BIGINT NOT NULL DEFAULT -1 REFERENCES `user`(`user_id`),
+    `created_by` BIGINT NOT NULL DEFAULT -1,
     `modified_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `modified_by` BIGINT NOT NULL DEFAULT -1 REFERENCES `user`(`user_id`),
-    CHECK ((provides_temp_housing is false) or (home_address is not null))
+    `modified_by` BIGINT NOT NULL DEFAULT -1,
+    CHECK ((provides_temp_housing is false) or (home_address is not null)),
+    CONSTRAINT `fk_volunteer_user_id` FOREIGN KEY (`user_id`) REFERENCES `user`(`user_id`) ON DELETE CASCADE,
+    CONSTRAINT `fk_volunteer_created_by` FOREIGN KEY (`created_by`) REFERENCES `user`(`user_id`),
+    CONSTRAINT `fk_volunteer_modified_by` FOREIGN KEY (`modified_by`) REFERENCES `user`(`user_id`)
 );
 
 CREATE TABLE IF NOT EXISTS `administrator` (
     `administrator_id` BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    `user_id` BIGINT NOT NULL REFERENCES `user`(`user_id`) ON DELETE CASCADE,
+    `user_id` BIGINT NOT NULL,
     `affiliation` VARCHAR(255) NOT NULL,
     `primary_phone_number` VARCHAR(255) NOT NULL,
     `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `created_by` BIGINT NOT NULL REFERENCES `user`(`user_id`),
+    `created_by` BIGINT NOT NULL DEFAULT -1,
     `modified_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `modified_by` BIGINT NOT NULL REFERENCES `user`(`user_id`)
+    `modified_by` BIGINT NOT NULL DEFAULT -1,
+    CONSTRAINT `fk_administrator_user_id` FOREIGN KEY (`user_id`) REFERENCES `user`(`user_id`), -- No cascade delete because it's admin
+    CONSTRAINT `fk_administrator_created_by` FOREIGN KEY (`created_by`) REFERENCES `user`(`user_id`),
+    CONSTRAINT `fk_administrator_modified_by` FOREIGN KEY (`modified_by`) REFERENCES `user`(`user_id`)
 );
 
 CREATE TABLE IF NOT EXISTS `airport_pickup_assignment` (
     `airport_pickup_assignment_id` BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    `volunteer_id` BIGINT NOT NULL REFERENCES `volunteer`(`volunteer_id`) ON DELETE CASCADE,
-    `student_id` BIGINT NOT NULL REFERENCES `student`(`student_id`) ON DELETE CASCADE,
+    `volunteer_id` BIGINT NOT NULL,
+    `student_id` BIGINT NOT NULL,
     `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `created_by` BIGINT NOT NULL DEFAULT -1 REFERENCES `user`(`user_id`),
+    `created_by` BIGINT NOT NULL DEFAULT -1,
     `modified_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `modified_by` BIGINT NOT NULL DEFAULT -1 REFERENCES `user`(`user_id`),
-    UNIQUE(`volunteer_id`, `student_id`)
+    `modified_by` BIGINT NOT NULL DEFAULT -1,
+    UNIQUE(`volunteer_id`, `student_id`),
+    CONSTRAINT `fk_airport_pickup_assignment_volunteer_id` FOREIGN KEY (`volunteer_id`) REFERENCES `volunteer`(`volunteer_id`) ON DELETE CASCADE,
+    CONSTRAINT `fk_airport_pickup_assignment_student_id` FOREIGN KEY (`student_id`) REFERENCES `student`(`student_id`) ON DELETE CASCADE,
+    CONSTRAINT `fk_airport_pickup_assignment_created_by` FOREIGN KEY (`created_by`) REFERENCES `user`(`user_id`),
+    CONSTRAINT `fk_airport_pickup_assignment_modified_by` FOREIGN KEY (`modified_by`) REFERENCES `user`(`user_id`)
 );
 
 CREATE TABLE IF NOT EXISTS `airport_pickup_preference` (
     `airport_pickup_preference_id` BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    `volunteer_id` BIGINT NOT NULL REFERENCES `volunteer`(`volunteer_id`) ON DELETE CASCADE,
-    `student_id` BIGINT NOT NULL REFERENCES `student`(`student_id`) ON DELETE CASCADE,
+    `volunteer_id` BIGINT NOT NULL,
+    `student_id` BIGINT NOT NULL,
     `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `created_by` BIGINT NOT NULL DEFAULT -1 REFERENCES `user`(`user_id`),
+    `created_by` BIGINT NOT NULL DEFAULT -1,
     `modified_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `modified_by` BIGINT NOT NULL DEFAULT -1 REFERENCES `user`(`user_id`),
-    UNIQUE(`volunteer_id`, `student_id`)
+    `modified_by` BIGINT NOT NULL DEFAULT -1,
+    UNIQUE(`volunteer_id`, `student_id`),
+    CONSTRAINT `fk_airport_pickup_preference_volunteer_id` FOREIGN KEY (`volunteer_id`) REFERENCES `volunteer`(`volunteer_id`) ON DELETE CASCADE,
+    CONSTRAINT `fk_airport_pickup_preference_student_id` FOREIGN KEY (`student_id`) REFERENCES `student`(`student_id`) ON DELETE CASCADE,
+    CONSTRAINT `fk_airport_pickup_preference_created_by` FOREIGN KEY (`created_by`) REFERENCES `user`(`user_id`),
+    CONSTRAINT `fk_airport_pickup_preference_modified_by` FOREIGN KEY (`modified_by`) REFERENCES `user`(`user_id`)
 );
 
 CREATE TABLE IF NOT EXISTS `temp_housing_assignment` (
     `temp_housing_assignment_id` BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    `volunteer_id` BIGINT NOT NULL REFERENCES `volunteer`(`volunteer_id`) ON DELETE CASCADE,
-    `student_id` BIGINT NOT NULL REFERENCES `student`(`student_id`) ON DELETE CASCADE,
+    `volunteer_id` BIGINT NOT NULL,
+    `student_id` BIGINT NOT NULL,
     `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `created_by` BIGINT NOT NULL DEFAULT -1 REFERENCES `user`(`user_id`),
+    `created_by` BIGINT NOT NULL DEFAULT -1,
     `modified_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `modified_by` BIGINT NOT NULL DEFAULT -1 REFERENCES `user`(`user_id`),
-    UNIQUE(`volunteer_id`, `student_id`)
+    `modified_by` BIGINT NOT NULL DEFAULT -1,
+    UNIQUE(`volunteer_id`, `student_id`),
+    CONSTRAINT `fk_temp_housing_assignment_volunteer_id` FOREIGN KEY (`volunteer_id`) REFERENCES `volunteer`(`volunteer_id`) ON DELETE CASCADE,
+    CONSTRAINT `fk_temp_housing_assignment_student_id` FOREIGN KEY (`student_id`) REFERENCES `student`(`student_id`) ON DELETE CASCADE,
+    CONSTRAINT `fk_temp_housing_assignment_created_by` FOREIGN KEY (`created_by`) REFERENCES `user`(`user_id`),
+    CONSTRAINT `fk_temp_housing_assignment_modified_by` FOREIGN KEY (`modified_by`) REFERENCES `user`(`user_id`)
 );
 
 -- Only one entry - so no id column
@@ -174,21 +223,11 @@ CREATE TABLE IF NOT EXISTS `management` (
     `student_registration_end_date` DATE NOT NULL,
     `announcement` TEXT NOT NULL,
     `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `created_by` BIGINT NOT NULL DEFAULT -1 REFERENCES `user`(`user_id`),
+    `created_by` BIGINT NOT NULL DEFAULT -1,
     `modified_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `modified_by` BIGINT NOT NULL DEFAULT -1 REFERENCES `user`(`user_id`)
-);
-
-CREATE TABLE IF NOT EXISTS `reference` (
-    `reference_id` BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    `reference_type` VARCHAR(255) NOT NULL,
-    `value` VARCHAR(255) NOT NULL,
-    `alternate_value` VARCHAR(255),
-    `parent_reference_id` BIGINT REFERENCES `reference`(`reference_id`),
-    `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `created_by` BIGINT NOT NULL DEFAULT -1 REFERENCES `user`(`user_id`),
-    `modified_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `modified_by` BIGINT NOT NULL DEFAULT -1 REFERENCES `user`(`user_id`)
+    `modified_by` BIGINT NOT NULL DEFAULT -1,
+    CONSTRAINT `fk_management_created_by` FOREIGN KEY (`created_by`) REFERENCES `user`(`user_id`),
+    CONSTRAINT `fk_management_modified_by` FOREIGN KEY (`modified_by`) REFERENCES `user`(`user_id`)
 );
 
 -- Initial Data

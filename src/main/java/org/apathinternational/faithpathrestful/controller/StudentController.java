@@ -20,6 +20,7 @@ import org.apathinternational.faithpathrestful.model.request.UpdateStudentFlight
 import org.apathinternational.faithpathrestful.model.request.UpdateStudentProfileRequest;
 import org.apathinternational.faithpathrestful.model.request.UpdateStudentTempHousingRequest;
 import org.apathinternational.faithpathrestful.model.response.GetStudentResponse;
+import org.apathinternational.faithpathrestful.model.response.GetStudentsResponse;
 import org.apathinternational.faithpathrestful.model.response.MessageReponse;
 import org.apathinternational.faithpathrestful.response.ResponseHandler;
 import org.apathinternational.faithpathrestful.service.SessionService;
@@ -160,6 +161,18 @@ public class StudentController {
         studentService.createStudent(studentUser);
 
         return ResponseHandler.generateResponse(new MessageReponse("Student User created successfully."));
+    }
+
+    @GetMapping("/getStudents")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<?> getStudents() {
+        List<Student> students = studentService.getAllStudents();
+
+        GetStudentsResponse response = new GetStudentsResponse();
+
+        response.setStudentsFromStudentList(students);
+
+        return ResponseHandler.generateResponse(response);
     }
 
     @GetMapping("/getProfile/{userId}")
