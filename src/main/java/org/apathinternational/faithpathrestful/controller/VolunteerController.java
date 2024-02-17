@@ -11,6 +11,7 @@ import org.apathinternational.faithpathrestful.entity.UserSecurityQuestion;
 import org.apathinternational.faithpathrestful.entity.Volunteer;
 import org.apathinternational.faithpathrestful.model.entityDTO.UserAccountDTO;
 import org.apathinternational.faithpathrestful.model.entityDTO.VolunteerAirportPickupDTO;
+import org.apathinternational.faithpathrestful.model.entityDTO.VolunteerDTO;
 import org.apathinternational.faithpathrestful.model.entityDTO.VolunteerProfileDTO;
 import org.apathinternational.faithpathrestful.model.entityDTO.VolunteerTempHousingDTO;
 import org.apathinternational.faithpathrestful.model.request.RegisterVolunteerRequest;
@@ -18,6 +19,7 @@ import org.apathinternational.faithpathrestful.model.request.UpdateVolunteerAirp
 import org.apathinternational.faithpathrestful.model.request.UpdateVolunteerProfileRequest;
 import org.apathinternational.faithpathrestful.model.request.UpdateVolunteerTempHousingRequest;
 import org.apathinternational.faithpathrestful.model.response.GetVolunteerResponse;
+import org.apathinternational.faithpathrestful.model.response.GetVolunteersResponse;
 import org.apathinternational.faithpathrestful.model.response.MessageReponse;
 import org.apathinternational.faithpathrestful.response.ResponseHandler;
 import org.apathinternational.faithpathrestful.service.SessionService;
@@ -152,6 +154,50 @@ public class VolunteerController {
         return ResponseHandler.generateResponse(response);
     }
 
+    @GetMapping("/getVolunteers")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<?> getVolunteers() {
+        List<Volunteer> volunteers = volunteerService.getAllVolunteers();
+
+        GetVolunteersResponse response = new GetVolunteersResponse();
+
+        response.setVolunteersFromVolunteerList(volunteers);
+
+        return ResponseHandler.generateResponse(response);
+    }
+
+    @GetMapping("/getVolunteer/{userId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STUDENT') or hasRole('ROLE_VOLUNTEER')")
+    public ResponseEntity<?> getVolunteer(@PathVariable(required=true, name="userId") Long userId) {
+        User authedUser = sessionService.getAuthedUser();
+
+        if(authedUser.isVolunteer() && !authedUser.getId().equals(userId)) {
+            throw new CustomAccessDeniedException("You are not authorized to view this volunteer.");
+        }
+
+        Volunteer volunteer = volunteerService.getVolunteerByUserId(userId);
+
+        if(volunteer == null) {
+            throw new BusinessException("User is found but volunteer data is missing.");
+        }
+
+        VolunteerDTO volunteerDTO = new VolunteerDTO(volunteer);
+
+        // If the user is a volunteer, we don't want to return the user account information
+        if(authedUser.isVolunteer())
+        {
+            UserAccountDTO nullUserAccountDTO = null;
+            volunteerDTO.setUserAccount(nullUserAccountDTO);
+        }
+
+        GetVolunteerResponse response = new GetVolunteerResponse();
+
+        response.setVolunteer(volunteerDTO);
+
+        return ResponseHandler.generateResponse(response);
+    }
+
+
     @GetMapping("/getAirportPickup/{userId}")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STUDENT') or hasRole('ROLE_VOLUNTEER')")
     public ResponseEntity<?> getAirportPickup(@PathVariable(required=true, name="userId") Long userId) {
@@ -221,6 +267,10 @@ public class VolunteerController {
         volunteerUser.setLastName(volunteerProfile.getLastName());
         volunteerUser.setGender(volunteerProfile.getGender());
         volunteerUser.setEmailAddress(volunteerProfile.getEmailAddress());
+
+        if(volunteerProfile.getEnabled() != null) {
+            volunteerUser.setEnabled(volunteerProfile.getEnabled());
+        }
 
         volunteer.setAffiliation(volunteerProfile.getAffiliation());
         volunteer.setPrimaryPhoneNumber(volunteerProfile.getPrimaryPhoneNumber());

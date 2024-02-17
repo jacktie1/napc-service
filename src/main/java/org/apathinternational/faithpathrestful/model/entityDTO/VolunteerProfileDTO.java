@@ -29,6 +29,8 @@ public class VolunteerProfileDTO {
 
     private String wechatId;
 
+    private Boolean enabled;
+
     public VolunteerProfileDTO() {
     }
 
@@ -41,6 +43,7 @@ public class VolunteerProfileDTO {
         this.primaryPhoneNumber = volunteer.getPrimaryPhoneNumber();
         this.secondaryPhoneNumber = volunteer.getSecondaryPhoneNumber();
         this.wechatId = volunteer.getWechatId();
+        this.enabled = volunteer.getUser().getEnabled();
     }
 
     public String getFirstName() {
@@ -75,6 +78,10 @@ public class VolunteerProfileDTO {
         return wechatId;
     }
 
+    public Boolean getEnabled() {
+        return enabled;
+    }
+
     public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
@@ -105,6 +112,10 @@ public class VolunteerProfileDTO {
 
     public void setWechatId(String wechatId) {
         this.wechatId = wechatId;
+    }
+
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
     }
     
 }

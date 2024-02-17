@@ -1,5 +1,7 @@
 package org.apathinternational.faithpathrestful.model.entityDTO;
 
+import java.util.Date;
+
 import org.apathinternational.faithpathrestful.entity.Volunteer;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -20,6 +22,9 @@ public class VolunteerDTO {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private VolunteerTempHousingDTO volunteerTempHousing;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Date modifiedAt;
+
     public VolunteerDTO() {
     }
 
@@ -29,6 +34,16 @@ public class VolunteerDTO {
         this.volunteerProfile = new VolunteerProfileDTO(volunteer);
         this.volunteerAirportPickup = new VolunteerAirportPickupDTO(volunteer);
         this.volunteerTempHousing = new VolunteerTempHousingDTO(volunteer);
+
+        Date volunteerModifiedAt = volunteer.getModifiedAt();
+        Date userModifiedAt = volunteer.getUser().getModifiedAt();
+
+        // Set the modifiedAt to the latest modifiedAt
+        if (volunteerModifiedAt.after(userModifiedAt)) {
+            this.modifiedAt = volunteerModifiedAt;
+        } else {
+            this.modifiedAt = userModifiedAt;
+        }
     }
 
     public Long getVolunteerId() {
@@ -89,5 +104,9 @@ public class VolunteerDTO {
 
     public void setVolunteerId(Volunteer volunteer) {
         this.setVolunteerId(volunteer.getId());
+    }
+
+    public Date getModifiedAt() {
+        return modifiedAt;
     }
 }

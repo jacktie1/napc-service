@@ -11,6 +11,7 @@ import org.apathinternational.faithpathrestful.entity.User;
 import org.apathinternational.faithpathrestful.repository.VolunteerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import java.util.List;
 
 @Service
 public class VolunteerService {
@@ -48,6 +49,10 @@ public class VolunteerService {
         volunteer.setUser(savedUser);
         
         return volunteerRepository.save(volunteer);
+    }
+
+    public List<Volunteer> getAllVolunteers() {
+        return volunteerRepository.findAll();
     }
 
     public Volunteer getVolunteerByUserId(Long userId) {

@@ -10,6 +10,7 @@ import org.apathinternational.faithpathrestful.entity.Student;
 import org.apathinternational.faithpathrestful.entity.User;
 import org.apathinternational.faithpathrestful.entity.UserSecurityQuestion;
 import org.apathinternational.faithpathrestful.model.entityDTO.StudentCommentDTO;
+import org.apathinternational.faithpathrestful.model.entityDTO.StudentDTO;
 import org.apathinternational.faithpathrestful.model.entityDTO.StudentFlightInfoDTO;
 import org.apathinternational.faithpathrestful.model.entityDTO.StudentProfileDTO;
 import org.apathinternational.faithpathrestful.model.entityDTO.StudentTempHousingDTO;
@@ -174,6 +175,38 @@ public class StudentController {
 
         return ResponseHandler.generateResponse(response);
     }
+
+    @GetMapping("/getStudent/{userId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STUDENT') or hasRole('ROLE_VOLUNTEER')")
+    public ResponseEntity<?> getStudent(@PathVariable(required=true, name="userId") Long userId) {
+        User authedUser = sessionService.getAuthedUser();
+
+        if(authedUser.isStudent() && !authedUser.getId().equals(userId)) {
+            throw new CustomAccessDeniedException("You are not authorized to view this student.");
+        }
+
+        Student student = studentService.getStudentByUserId(userId);
+
+        if(student == null) {
+            throw new BusinessException("User is found but student data is missing.");
+        }
+
+        StudentDTO studentDTO = new StudentDTO(student);
+
+        // If the user is a volunteer, we don't want to return the user account information
+        if(authedUser.isVolunteer())
+        {
+            UserAccountDTO nullUserAccountDTO = null;
+            studentDTO.setUserAccount(nullUserAccountDTO);
+        }
+
+        GetStudentResponse response = new GetStudentResponse();
+
+        response.setStudent(studentDTO);
+
+        return ResponseHandler.generateResponse(response);
+    }
+
 
     @GetMapping("/getProfile/{userId}")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STUDENT') or hasRole('ROLE_VOLUNTEER')")
