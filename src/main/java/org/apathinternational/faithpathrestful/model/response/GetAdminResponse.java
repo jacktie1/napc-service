@@ -5,34 +5,34 @@ import org.apathinternational.faithpathrestful.model.entityDTO.AdminDTO;
 
 
 public class GetAdminResponse {
-    private AdminDTO volunteer;
+    private AdminDTO admin;
 
     public GetAdminResponse() {
     }
 
     public AdminDTO getAdmin() {
-        return volunteer;
+        return admin;
     }
 
-    public void setAdmin(AdminDTO volunteer) {
-        this.volunteer = volunteer;
+    public void setAdmin(AdminDTO admin) {
+        this.admin = admin;
     }
 
-    public void setUserAccount(Administrator volunteer) {
-        if(this.volunteer == null)
+    public void setUserAccount(Administrator admin) {
+        if(this.admin == null)
         {
-            this.volunteer = new AdminDTO();
+            this.admin = new AdminDTO();
         }
 
-        this.volunteer.setUserAccount(volunteer);
+        this.admin.setUserAccountFromAdminEntity(admin);
     }
 
-    public void setAdminProfile(Administrator volunteer) {
-        if(this.volunteer == null)
+    public void setAdminProfile(Administrator admin) {
+        if(this.admin == null)
         {
-            this.volunteer = new AdminDTO();
+            this.admin = new AdminDTO();
         }
 
-        this.volunteer.setAdminProfile(volunteer);
+        this.admin.setAdminProfileFromAdminEntity(admin);
     }
 }

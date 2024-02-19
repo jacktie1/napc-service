@@ -24,7 +24,7 @@ public class GetVolunteerResponse {
             this.volunteer = new VolunteerDTO();
         }
 
-        this.volunteer.setUserAccount(volunteer);
+        this.volunteer.setUserAccountFromVolunteerEntity(volunteer);
     }
 
     public void setVolunteerProfile(Volunteer volunteer) {
@@ -33,7 +33,7 @@ public class GetVolunteerResponse {
             this.volunteer = new VolunteerDTO();
         }
 
-        this.volunteer.setVolunteerProfile(volunteer);
+        this.volunteer.setVolunteerProfileFromVolunteerEntity(volunteer);
     }
 
     public void setVolunteerAirportPickup(Volunteer volunteer) {
@@ -42,7 +42,7 @@ public class GetVolunteerResponse {
             this.volunteer = new VolunteerDTO();
         }
 
-        this.volunteer.setVolunteerAirportPickup(volunteer);
+        this.volunteer.setVolunteerAirportPickupFromVolunteerEntity(volunteer);
     }
 
     public void setVolunteerTempHousing(Volunteer volunteer) {
@@ -51,7 +51,7 @@ public class GetVolunteerResponse {
             this.volunteer = new VolunteerDTO();
         }
 
-        this.volunteer.setVolunteerTempHousing(volunteer);
+        this.volunteer.setVolunteerTempHousingFromVolunteerEntity(volunteer);
     }
     
 }

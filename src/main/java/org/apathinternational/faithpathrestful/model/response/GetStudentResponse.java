@@ -24,7 +24,7 @@ public class GetStudentResponse {
             this.student = new StudentDTO();
         }
 
-        this.student.setUserAccount(student);
+        this.student.setUserAccountFromStudentEntity(student);
     }
 
     public void setStudentProfile(Student student) {
@@ -33,7 +33,7 @@ public class GetStudentResponse {
             this.student = new StudentDTO();
         }
 
-        this.student.setStudentProfile(student);
+        this.student.setStudentProfileFromStudentEntity(student);
     }
 
     public void setStudentFlightInfo(Student student) {
@@ -42,7 +42,7 @@ public class GetStudentResponse {
             this.student = new StudentDTO();
         }
 
-        this.student.setStudentFlightInfo(student);
+        this.student.setStudentFlightInfoFromStudentEntity(student);
     }
 
     public void setStudentTempHousing(Student student) {
@@ -51,7 +51,7 @@ public class GetStudentResponse {
             this.student = new StudentDTO();
         }
 
-        this.student.setStudentTempHousing(student);
+        this.student.setStudentTempHousingFromStudentEntity(student);
     }
 
     public void setStudentComment(Student student) {
@@ -60,7 +60,7 @@ public class GetStudentResponse {
             this.student = new StudentDTO();
         }
 
-        this.student.setStudentComment(student);
+        this.student.setStudentCommentFromStudentEntity(student);
     }
     
 }

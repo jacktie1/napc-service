@@ -6,10 +6,13 @@ import java.util.Map;
 
 import org.apathinternational.faithpathrestful.common.exception.BusinessException;
 import org.apathinternational.faithpathrestful.common.exception.ValidationException;
+import org.apathinternational.faithpathrestful.entity.AirportPickupAssignment;
+import org.apathinternational.faithpathrestful.entity.Management;
 import org.apathinternational.faithpathrestful.entity.Reference;
 import org.apathinternational.faithpathrestful.entity.Role;
 import org.apathinternational.faithpathrestful.entity.Student;
 import org.apathinternational.faithpathrestful.entity.User;
+import org.apathinternational.faithpathrestful.entity.Volunteer;
 import org.apathinternational.faithpathrestful.repository.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,6 +24,9 @@ public class StudentService {
     StudentRepository studentRepository;
 
     @Autowired
+    ManagementService managementService;
+
+    @Autowired
     private RoleService roleService;
 
     @Autowired
@@ -28,6 +34,10 @@ public class StudentService {
 
     @Autowired
     private UserService userService;
+
+    public Student getStudentById(Long studentId) {
+        return studentRepository.findById(studentId).orElse(null);
+    }
 
     public Student createStudent(Student student) {
         Map<String, String> fieldErrors = new HashMap<String, String>();
@@ -120,12 +130,41 @@ public class StudentService {
         return studentRepository.findAll();
     }
 
+    public List<Student> getStudentsWithAirportPickupNeeds(Boolean checkAssignmentStart, Boolean includeAssigned) {
+        // Get the management to check if the assignment has started
+
+        if(checkAssignmentStart)
+        {   
+            Management management = managementService.getManagement();
+
+            if(management == null)
+            {
+                throw new BusinessException("Management not found. Please check the management and try again.");
+            }
+
+            if(!management.getDoesAssignmentStart())
+            {
+                List<Student> emptyList = List.of();
+                return emptyList;
+            }
+        }
+
+        if(includeAssigned)
+        {
+            return studentRepository.findStudentsWithAirportPickupNeeds();
+        }
+        else
+        {
+            return studentRepository.findUnassignedStudentsWithAirportPickupNeeds();
+        }
+    }
+
     public Student getStudentByUserId(Long userId) {
         User studentUser = userService.getUserById(userId);
 
         if(studentUser == null)
         {
-            throw new BusinessException("User not found. Please check the user and try again.");
+            throw new BusinessException("User with id " + userId + " not found. Please check the user and try again.");
         }
 
         if(studentUser.isStudent())
@@ -134,8 +173,24 @@ public class StudentService {
         }
         else
         {
-            throw new BusinessException("User is not a student. Please check the user and try again.");
+            throw new BusinessException("User with id " + userId + " is not a student. Please check the user and try again.");
         }
+    }
+
+    public void updateAirportPickupAssignment(Student student, Volunteer newAssignedVolunteer) {
+        if(newAssignedVolunteer == null)
+        {
+            student.setAirportPickupAssignment(null);
+        }
+        else
+        {
+            AirportPickupAssignment newAirportPickupAssignment = new AirportPickupAssignment();
+            newAirportPickupAssignment.setStudent(student);
+            newAirportPickupAssignment.setVolunteer(newAssignedVolunteer);
+            student.setAirportPickupAssignment(newAirportPickupAssignment);
+        }
+        
+        studentRepository.save(student);
     }
 
     public void deleteStudents(List<Long> studentIds) {

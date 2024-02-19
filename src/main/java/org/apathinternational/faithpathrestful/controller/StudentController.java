@@ -9,6 +9,7 @@ import org.apathinternational.faithpathrestful.entity.Reference;
 import org.apathinternational.faithpathrestful.entity.Student;
 import org.apathinternational.faithpathrestful.entity.User;
 import org.apathinternational.faithpathrestful.entity.UserSecurityQuestion;
+import org.apathinternational.faithpathrestful.entity.Volunteer;
 import org.apathinternational.faithpathrestful.model.entityDTO.StudentCommentDTO;
 import org.apathinternational.faithpathrestful.model.entityDTO.StudentDTO;
 import org.apathinternational.faithpathrestful.model.entityDTO.StudentFlightInfoDTO;
@@ -16,6 +17,7 @@ import org.apathinternational.faithpathrestful.model.entityDTO.StudentProfileDTO
 import org.apathinternational.faithpathrestful.model.entityDTO.StudentTempHousingDTO;
 import org.apathinternational.faithpathrestful.model.entityDTO.UserAccountDTO;
 import org.apathinternational.faithpathrestful.model.request.RegisterStudentRequest;
+import org.apathinternational.faithpathrestful.model.request.UpdateStudentAirportPickupAssignmentRequest;
 import org.apathinternational.faithpathrestful.model.request.UpdateStudentCommentRequest;
 import org.apathinternational.faithpathrestful.model.request.UpdateStudentFlightInfoRequest;
 import org.apathinternational.faithpathrestful.model.request.UpdateStudentProfileRequest;
@@ -26,6 +28,7 @@ import org.apathinternational.faithpathrestful.model.response.MessageReponse;
 import org.apathinternational.faithpathrestful.response.ResponseHandler;
 import org.apathinternational.faithpathrestful.service.SessionService;
 import org.apathinternational.faithpathrestful.service.StudentService;
+import org.apathinternational.faithpathrestful.service.VolunteerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -53,6 +56,9 @@ public class StudentController {
 
     @Autowired
     private StudentService studentService;
+
+    @Autowired
+    private VolunteerService volunteerService;
 
     @Autowired
     private SessionService sessionService;
@@ -177,7 +183,7 @@ public class StudentController {
     }
 
     @GetMapping("/getStudent/{userId}")
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STUDENT') or hasRole('ROLE_VOLUNTEER')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STUDENT')")
     public ResponseEntity<?> getStudent(@PathVariable(required=true, name="userId") Long userId) {
         User authedUser = sessionService.getAuthedUser();
 
@@ -207,9 +213,78 @@ public class StudentController {
         return ResponseHandler.generateResponse(response);
     }
 
+    @GetMapping("/getAirportPickupNeeds")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_VOLUNTEER')")
+    public ResponseEntity<?> getAirportPickupNeeds() {
+        User authedUser = sessionService.getAuthedUser();
+
+        List<Student> students;
+
+        if(authedUser.isAdmin()){
+            // not to check the assignment start
+            // include the assigned students
+            students = studentService.getStudentsWithAirportPickupNeeds(false, true);
+        } else if (authedUser.isVolunteer()) {
+            // to check the assignment start
+            // not to include the assigned students
+            students = studentService.getStudentsWithAirportPickupNeeds(true, false);
+        } else  {
+            throw new CustomAccessDeniedException("You are not authorized to access this resource.");
+        }
+
+        List<StudentDTO> studentDTOs = new ArrayList<StudentDTO>();
+
+        for(Student student : students)
+        {
+            StudentDTO studentDTO;
+
+            if(authedUser.isAdmin()) {
+                studentDTO = new StudentDTO(student);
+
+                studentDTO.setAirportPickupAssignmentFromStudentEntity(student);
+                studentDTOs.add(studentDTO);
+            }
+            // only return the necessary information for the volunteer
+            else if (authedUser.isVolunteer()) {
+                studentDTO = new StudentDTO();
+
+                UserAccountDTO userAccount = new UserAccountDTO();
+                StudentFlightInfoDTO studentFlightInfo = new StudentFlightInfoDTO(student);
+                StudentProfileDTO studentProfile = new StudentProfileDTO();
+                
+                userAccount.setUserId(student.getUser().getId());
+    
+                if(student.getMajorReference() != null)
+                {
+                    studentProfile.setMajorReferenceId(student.getMajorReference().getId());
+                }
+                else
+                {
+                    studentProfile.setCustomMajor(student.getCustomMajor());
+                }
+    
+                studentProfile.setIsNewStudent(student.getIsNewStudent());
+    
+                studentDTO.setUserAccount(userAccount);
+                studentDTO.setStudentProfile(studentProfile);
+                studentDTO.setStudentFlightInfo(studentFlightInfo);
+
+                studentDTOs.add(studentDTO);
+            } else {
+                throw new CustomAccessDeniedException("You are not authorized to access this resource.");
+            }
+        }
+
+        GetStudentsResponse response = new GetStudentsResponse();
+
+        response.setStudents(studentDTOs);
+
+        return ResponseHandler.generateResponse(response);
+    }
+
 
     @GetMapping("/getProfile/{userId}")
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STUDENT') or hasRole('ROLE_VOLUNTEER')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STUDENT')")
     public ResponseEntity<?> getProfile(@PathVariable(required=true, name="userId") Long userId) {
         User authedUser = sessionService.getAuthedUser();
 
@@ -231,7 +306,7 @@ public class StudentController {
     }
 
     @GetMapping("/getFlightInfo/{userId}")
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STUDENT') or hasRole('ROLE_VOLUNTEER')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STUDENT')")
     public ResponseEntity<?> getFlightInfo(@PathVariable(required=true, name="userId") Long userId) {
         User authedUser = sessionService.getAuthedUser();
 
@@ -253,7 +328,7 @@ public class StudentController {
     }
 
     @GetMapping("/getTempHousing/{userId}")
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STUDENT') or hasRole('ROLE_VOLUNTEER')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STUDENT')")
     public ResponseEntity<?> getTempHousing(@PathVariable(required=true, name="userId") Long userId) {
         User authedUser = sessionService.getAuthedUser();
 
@@ -275,7 +350,7 @@ public class StudentController {
     }
 
     @GetMapping("/getComment/{userId}")
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STUDENT') or hasRole('ROLE_VOLUNTEER')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STUDENT')")
     public ResponseEntity<?> getComment(@PathVariable(required=true, name="userId") Long userId) {
         User authedUser = sessionService.getAuthedUser();
 
@@ -466,6 +541,35 @@ public class StudentController {
         }
 
         return ResponseHandler.generateResponse(new MessageReponse("Comment updated successfully."));
+    }
+
+    @PutMapping("/updateAirportPickupAssignment/{userId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @Transactional
+    public ResponseEntity<?> updateAirportPickupAssignment(@PathVariable(required=true, name="userId") Long userId, @Valid @RequestBody UpdateStudentAirportPickupAssignmentRequest request) {
+        User authedUser = sessionService.getAuthedUser();
+
+        if(!authedUser.isAdmin()) {
+            throw new CustomAccessDeniedException("You are not authorized to modify this resource.");
+        }
+
+        Student student = studentService.getStudentByUserId(userId);
+
+        if(student == null) {
+            throw new BusinessException("User is found but student data is missing.");
+        }
+
+        Long volunteerUserId = request.getVolunteerUserId();
+
+        Volunteer volunteerUser = null;
+
+        if(volunteerUserId != null) {
+            volunteerUser = volunteerService.getVolunteerByUserId(volunteerUserId);
+        } 
+
+        studentService.updateAirportPickupAssignment(student, volunteerUser);
+
+        return ResponseHandler.generateResponse(new MessageReponse("Airport pickup assignment updated successfully."));
     }
     
 }

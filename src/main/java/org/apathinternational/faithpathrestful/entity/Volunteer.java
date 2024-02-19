@@ -1,10 +1,12 @@
 package org.apathinternational.faithpathrestful.entity;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -12,6 +14,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
@@ -91,6 +94,15 @@ public class Volunteer extends AuditableEntity {
 
     @Column(name = "temp_housing_comment")
     private String tempHousingComment;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "volunteer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AirportPickupPreference> airportPickupPreferences;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "volunteer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AirportPickupAssignment> airportPickupAssignments;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "volunteer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TempHousingAssignment> tempHousingAssignments;
 
     public Volunteer() {
     }
@@ -187,6 +199,18 @@ public class Volunteer extends AuditableEntity {
         return tempHousingComment;
     }
 
+    public List<AirportPickupPreference> getAirportPickupPreferences() {
+        return airportPickupPreferences;
+    }
+
+    public List<AirportPickupAssignment> getAirportPickupAssignments() {
+        return airportPickupAssignments;
+    }
+
+    public List<TempHousingAssignment> getTempHousingAssignments() {
+        return tempHousingAssignments;
+    }
+
     public void setUser(User user) {
         this.user = user;
     }
@@ -273,6 +297,18 @@ public class Volunteer extends AuditableEntity {
 
     public void setTempHousingComment(String tempHousingComment) {
         this.tempHousingComment = tempHousingComment;
+    }
+
+    public void setAirportPickupPreferences(List<AirportPickupPreference> airportPickupPreferences) {
+        this.airportPickupPreferences = airportPickupPreferences;
+    }
+
+    public void setAirportPickupAssignments(List<AirportPickupAssignment> airportPickupAssignments) {
+        this.airportPickupAssignments = airportPickupAssignments;
+    }
+
+    public void setTempHousingAssignments(List<TempHousingAssignment> tempHousingAssignments) {
+        this.tempHousingAssignments = tempHousingAssignments;
     }
 
 }

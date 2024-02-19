@@ -28,6 +28,10 @@ public class StudentDTO {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Date modifiedAt;
 
+    // Lazy fields
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private AirportPickupAssignmentDTO airportPickupAssignment;
+
     public StudentDTO() {
     }
 
@@ -78,6 +82,10 @@ public class StudentDTO {
         return modifiedAt;
     }
 
+    public AirportPickupAssignmentDTO getAirportPickupAssignment() {
+        return airportPickupAssignment;
+    }
+
     public void setStudentId(Long studentId) {
         this.studentId = studentId;
     }
@@ -106,27 +114,42 @@ public class StudentDTO {
         this.modifiedAt = modifiedAt;
     }
 
-    public void setUserAccount(Student student) {
+    public void setAirportPickupAssignment(AirportPickupAssignmentDTO airportPickupAssignment) {
+        this.airportPickupAssignment = airportPickupAssignment;
+    }
+
+    public void setUserAccountFromStudentEntity(Student student) {
         this.setUserAccount(new UserAccountDTO(student.getUser()));
     }
 
-    public void setStudentProfile(Student student) {
+    public void setStudentProfileFromStudentEntity(Student student) {
         this.setStudentProfile(new StudentProfileDTO(student));
     }
 
-    public void setStudentFlightInfo(Student student) {
+    public void setStudentFlightInfoFromStudentEntity(Student student) {
         this.setStudentFlightInfo(new StudentFlightInfoDTO(student));
     }
 
-    public void setStudentTempHousing(Student student) {
+    public void setStudentTempHousingFromStudentEntity(Student student) {
         this.setStudentTempHousing(new StudentTempHousingDTO(student));
     }
 
-    public void setStudentComment(Student student) {
+    public void setStudentCommentFromStudentEntity(Student student) {
         this.setStudentComment(new StudentCommentDTO(student));
     }
 
-    public void setStudentId(Student student) {
+    public void setStudentIdFromStudentEntity(Student student) {
         this.setStudentId(student.getId());
     }
+
+    public void setAirportPickupAssignmentFromStudentEntity(Student student) {
+        if (student.getAirportPickupAssignment() != null) {
+            this.setAirportPickupAssignment(new AirportPickupAssignmentDTO(student.getAirportPickupAssignment()));
+        } else {
+            AirportPickupAssignmentDTO emptyAirportPickupAssignment = new AirportPickupAssignmentDTO();
+            this.setAirportPickupAssignment(emptyAirportPickupAssignment);
+        }
+    }
+
+
 }

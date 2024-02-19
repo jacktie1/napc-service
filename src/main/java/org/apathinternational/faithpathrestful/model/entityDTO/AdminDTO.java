@@ -47,15 +47,15 @@ public class AdminDTO {
         this.adminProfile = adminProfile;
     }
 
-    public void setUserAccount(Administrator admin) {
+    public void setUserAccountFromAdminEntity(Administrator admin) {
         this.setUserAccount(new UserAccountDTO(admin.getUser()));
     }
 
-    public void setAdminProfile(Administrator admin) {
+    public void setAdminProfileFromAdminEntity(Administrator admin) {
         this.setAdminProfile(new AdminProfileDTO(admin));
     }
 
-    public void setAdminId(Administrator admin) {
+    public void setAdminIdFromAdminEntity(Administrator admin) {
         this.setAdminId(admin.getId());
     }
 }

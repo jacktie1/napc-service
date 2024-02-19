@@ -1,5 +1,6 @@
 package org.apathinternational.faithpathrestful.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -127,6 +128,12 @@ public class Student extends AuditableEntity {
 
     @Column(name = "admin_comment")
     private String adminComment;
+
+    @OneToOne(mappedBy = "student", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private AirportPickupAssignment airportPickupAssignment;
+
+    @OneToOne(mappedBy = "student", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private TempHousingAssignment tempHousingAssignment;
 
     public Student() {
     }
@@ -263,6 +270,14 @@ public class Student extends AuditableEntity {
         return adminComment;
     }
 
+    public AirportPickupAssignment getAirportPickupAssignment() {
+        return airportPickupAssignment;
+    }
+
+    public TempHousingAssignment getTempHousingAssignment() {
+        return tempHousingAssignment;
+    }
+
     public void setUser(User user) {
         this.user = user;
     }
@@ -389,6 +404,14 @@ public class Student extends AuditableEntity {
 
     public void setAdminComment(String adminComment) {
         this.adminComment = adminComment;
+    }
+
+    public void setAirportPickupAssignment(AirportPickupAssignment airportPickupAssignment) {
+        this.airportPickupAssignment = airportPickupAssignment;
+    }
+
+    public void setTempHousingAssignment(TempHousingAssignment tempHousingAssignment) {
+        this.tempHousingAssignment = tempHousingAssignment;
     }
     
 }

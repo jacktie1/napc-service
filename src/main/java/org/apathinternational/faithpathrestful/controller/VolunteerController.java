@@ -5,25 +5,36 @@ import java.util.List;
 
 import org.apathinternational.faithpathrestful.common.exception.BusinessException;
 import org.apathinternational.faithpathrestful.common.exception.CustomAccessDeniedException;
+import org.apathinternational.faithpathrestful.entity.AirportPickupAssignment;
+import org.apathinternational.faithpathrestful.entity.AirportPickupPreference;
 import org.apathinternational.faithpathrestful.entity.Reference;
+import org.apathinternational.faithpathrestful.entity.Student;
 import org.apathinternational.faithpathrestful.entity.User;
 import org.apathinternational.faithpathrestful.entity.UserSecurityQuestion;
 import org.apathinternational.faithpathrestful.entity.Volunteer;
+import org.apathinternational.faithpathrestful.model.entityDTO.AirportPickupAssignmentDTO;
+import org.apathinternational.faithpathrestful.model.entityDTO.AirportPickupPreferenceDTO;
 import org.apathinternational.faithpathrestful.model.entityDTO.UserAccountDTO;
 import org.apathinternational.faithpathrestful.model.entityDTO.VolunteerAirportPickupDTO;
 import org.apathinternational.faithpathrestful.model.entityDTO.VolunteerDTO;
 import org.apathinternational.faithpathrestful.model.entityDTO.VolunteerProfileDTO;
 import org.apathinternational.faithpathrestful.model.entityDTO.VolunteerTempHousingDTO;
 import org.apathinternational.faithpathrestful.model.request.RegisterVolunteerRequest;
+import org.apathinternational.faithpathrestful.model.request.UpdateVolunteerAirportPickupAssignmentsRequest;
+import org.apathinternational.faithpathrestful.model.request.UpdateAirportPickupPreferencesRequest;
 import org.apathinternational.faithpathrestful.model.request.UpdateVolunteerAirportPickupRequest;
 import org.apathinternational.faithpathrestful.model.request.UpdateVolunteerProfileRequest;
 import org.apathinternational.faithpathrestful.model.request.UpdateVolunteerTempHousingRequest;
+import org.apathinternational.faithpathrestful.model.response.GetAirportPickupAssignmentsResponse;
+import org.apathinternational.faithpathrestful.model.response.GetAirportPickupPreferencesResponse;
 import org.apathinternational.faithpathrestful.model.response.GetVolunteerResponse;
 import org.apathinternational.faithpathrestful.model.response.GetVolunteersResponse;
 import org.apathinternational.faithpathrestful.model.response.MessageReponse;
 import org.apathinternational.faithpathrestful.response.ResponseHandler;
 import org.apathinternational.faithpathrestful.service.SessionService;
+import org.apathinternational.faithpathrestful.service.StudentService;
 import org.apathinternational.faithpathrestful.service.VolunteerService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,6 +47,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -46,12 +58,14 @@ import jakarta.validation.Valid;
 @RequestMapping("/api/volunteer")
 @Validated
 public class VolunteerController {
-
     @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Autowired
     private VolunteerService volunteerService;
+
+    @Autowired
+    private StudentService studentService;
 
     @Autowired
     private SessionService sessionService;
@@ -133,7 +147,7 @@ public class VolunteerController {
     }
 
     @GetMapping("/getProfile/{userId}")
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STUDENT') or hasRole('ROLE_VOLUNTEER')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_VOLUNTEER')")
     public ResponseEntity<?> getProfile(@PathVariable(required=true, name="userId") Long userId) {
         User authedUser = sessionService.getAuthedUser();
 
@@ -156,23 +170,87 @@ public class VolunteerController {
 
     @GetMapping("/getVolunteers")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> getVolunteers() {
+    public ResponseEntity<?> getVolunteers(
+        @RequestParam(required = false, defaultValue = "false") Boolean includeAirportPickupPreferences,
+        @RequestParam(required = false, defaultValue = "false") Boolean includeTempHousingAssignments,
+        @RequestParam(required = false, defaultValue = "false") Boolean includeAirportPickupAssignments,
+        @RequestParam(required = false, defaultValue = "false") Boolean providesAirportPickup,
+        @RequestParam(required = false, defaultValue = "false") Boolean providesTempHousing
+        ) {
         List<Volunteer> volunteers = volunteerService.getAllVolunteers();
+
+        // If volunteers that provide airport pickup or temp housing are requested, we need to remove the ones that are not enabled
+        if(providesAirportPickup == true || providesTempHousing == true) {
+            volunteers.removeIf(volunteer -> volunteer.getUser().getEnabled() == false);
+        }
+
+        if(providesAirportPickup == true) {
+            volunteers.removeIf(volunteer -> volunteer.getProvidesAirportPickup() == false);
+        }
+
+        if(providesTempHousing == true) {
+            volunteers.removeIf(volunteer -> volunteer.getProvidesTempHousing() == false);
+        }
 
         GetVolunteersResponse response = new GetVolunteersResponse();
 
-        response.setVolunteersFromVolunteerList(volunteers);
+        List<VolunteerDTO> volunteerDTOs = new ArrayList<VolunteerDTO>();
+
+        for (Volunteer volunteer : volunteers) {
+            VolunteerDTO volunteerDTO = new VolunteerDTO(volunteer);
+
+            if(includeAirportPickupPreferences) {
+                volunteerDTO.setAirportPickupPreferencesFromVolunteerEntity(volunteer);
+            }
+
+            if(includeTempHousingAssignments) {
+                volunteerDTO.setTempHousingAssignmentsFromVolunteerEntity(volunteer);
+            }
+
+            if(includeAirportPickupAssignments) {
+                volunteerDTO.setAirportPickupAssignmentsFromVolunteerEntity(volunteer);
+            }
+
+            volunteerDTOs.add(volunteerDTO);
+        }
+
+        response.setVolunteers(volunteerDTOs);
 
         return ResponseHandler.generateResponse(response);
     }
 
     @GetMapping("/getVolunteer/{userId}")
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STUDENT') or hasRole('ROLE_VOLUNTEER')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_VOLUNTEER')")
     public ResponseEntity<?> getVolunteer(@PathVariable(required=true, name="userId") Long userId) {
         User authedUser = sessionService.getAuthedUser();
 
         if(authedUser.isVolunteer() && !authedUser.getId().equals(userId)) {
             throw new CustomAccessDeniedException("You are not authorized to view this volunteer.");
+        }
+
+        if(authedUser.isStudent()) {
+            Student student = authedUser.getStudent();
+            
+            List<Volunteer> assignedVolunteers = new ArrayList<Volunteer>();
+    
+            if(student.getAirportPickupAssignment() == null) {
+                assignedVolunteers.add(student.getAirportPickupAssignment().getVolunteer());
+            }
+
+            if(student.getTempHousingAssignment() == null) {
+                assignedVolunteers.add(student.getTempHousingAssignment().getVolunteer());
+            }
+
+            if(assignedVolunteers.size() == 0) {
+                throw new BusinessException("Student is not assigned to any volunteer.");
+            }
+
+            Boolean isStudentAssignedToRequestedVolunteer = assignedVolunteers.stream().anyMatch(volunteer -> volunteer.getUser().getId().equals(userId));
+
+            if(!isStudentAssignedToRequestedVolunteer)
+            {
+                throw new CustomAccessDeniedException("You are not authorized to view this volunteer.");
+            }
         }
 
         Volunteer volunteer = volunteerService.getVolunteerByUserId(userId);
@@ -184,7 +262,7 @@ public class VolunteerController {
         VolunteerDTO volunteerDTO = new VolunteerDTO(volunteer);
 
         // If the user is a volunteer, we don't want to return the user account information
-        if(authedUser.isVolunteer())
+        if(authedUser.isStudent())
         {
             UserAccountDTO nullUserAccountDTO = null;
             volunteerDTO.setUserAccount(nullUserAccountDTO);
@@ -199,7 +277,7 @@ public class VolunteerController {
 
 
     @GetMapping("/getAirportPickup/{userId}")
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STUDENT') or hasRole('ROLE_VOLUNTEER')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_VOLUNTEER')")
     public ResponseEntity<?> getAirportPickup(@PathVariable(required=true, name="userId") Long userId) {
         User authedUser = sessionService.getAuthedUser();
 
@@ -221,7 +299,7 @@ public class VolunteerController {
     }
 
     @GetMapping("/getTempHousing/{userId}")
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STUDENT') or hasRole('ROLE_VOLUNTEER')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_VOLUNTEER')")
     public ResponseEntity<?> getTempHousing(@PathVariable(required=true, name="userId") Long userId) {
         User authedUser = sessionService.getAuthedUser();
 
@@ -238,6 +316,72 @@ public class VolunteerController {
         GetVolunteerResponse response = new GetVolunteerResponse();
 
         response.setVolunteerTempHousing(volunteer);
+
+        return ResponseHandler.generateResponse(response);
+    }
+
+    @GetMapping("/getAirportPickupPreferences/{userId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_VOLUNTEER')")
+    public ResponseEntity<?> getAirportPickupPreferences(@PathVariable(required=true, name="userId") Long userId) {
+        User authedUser = sessionService.getAuthedUser();
+
+        if(authedUser.isVolunteer() && !authedUser.getId().equals(userId)) {
+            throw new CustomAccessDeniedException("You are not authorized to view this volunteer.");
+        }
+
+        Volunteer volunteer = volunteerService.getVolunteerByUserId(userId);
+
+        if(volunteer == null) {
+            throw new BusinessException("User is found but volunteer data is missing.");
+        }
+
+        GetAirportPickupPreferencesResponse response = new GetAirportPickupPreferencesResponse();
+
+        List<AirportPickupPreferenceDTO> airportPickupPreferenceDTOs = new ArrayList<AirportPickupPreferenceDTO>();
+
+        for (AirportPickupPreference airportPickupPreference : volunteer.getAirportPickupPreferences()) {
+            AirportPickupPreferenceDTO airportPickupPreferenceDTO = new AirportPickupPreferenceDTO(airportPickupPreference);
+            airportPickupPreferenceDTOs.add(airportPickupPreferenceDTO);
+        }
+
+        response.setAirportPickupPreferences(airportPickupPreferenceDTOs);
+
+        return ResponseHandler.generateResponse(response);
+    }
+
+    @GetMapping("/getAirportPickupAssignments/{userId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_VOLUNTEER')")
+    public ResponseEntity<?> getAirportPickupAssignments(
+        @PathVariable(required=true, name="userId") Long userId,
+        @RequestParam(required = false, defaultValue = "false") Boolean includeStudentDetails
+        ) {
+        User authedUser = sessionService.getAuthedUser();
+
+        if(authedUser.isVolunteer() && !authedUser.getId().equals(userId)) {
+            throw new CustomAccessDeniedException("You are not authorized to view this volunteer.");
+        }
+
+        Volunteer volunteer = volunteerService.getVolunteerByUserId(userId);
+
+        if(volunteer == null) {
+            throw new BusinessException("User is found but volunteer data is missing.");
+        }
+
+        GetAirportPickupAssignmentsResponse response = new GetAirportPickupAssignmentsResponse();
+
+        List<AirportPickupAssignmentDTO> airportPickupAssignmentDTOs = new ArrayList<AirportPickupAssignmentDTO>();
+
+        for (AirportPickupAssignment airportPickupAssignment : volunteer.getAirportPickupAssignments()) {
+            AirportPickupAssignmentDTO airportPickupAssignmentDTO = new AirportPickupAssignmentDTO(airportPickupAssignment);
+
+            if(includeStudentDetails) {
+                airportPickupAssignmentDTO.setStudentFromStudentEntity(airportPickupAssignment.getStudent());
+            }
+            
+            airportPickupAssignmentDTOs.add(airportPickupAssignmentDTO);
+        }
+
+        response.setAirportPickupAssignments(airportPickupAssignmentDTOs);
 
         return ResponseHandler.generateResponse(response);
     }
@@ -341,6 +485,68 @@ public class VolunteerController {
         volunteer.setTempHousingComment(VolunteerTempHousing.getTempHousingComment());
 
         return ResponseHandler.generateResponse(new MessageReponse("TempHousing updated successfully."));
+    }
+
+    @PutMapping("/updateAirportPickupPreferences/{userId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_VOLUNTEER')")
+    @Transactional
+    public ResponseEntity<?> updateAirportPickupPreferences(@PathVariable(required=true, name="userId") Long userId, @Valid @RequestBody UpdateAirportPickupPreferencesRequest request) {
+        User authedUser = sessionService.getAuthedUser();
+
+        if(authedUser.isVolunteer() && !authedUser.getId().equals(userId)) {
+            throw new CustomAccessDeniedException("You are not authorized to modify this resource.");
+        }
+
+        Volunteer volunteer = volunteerService.getVolunteerByUserId(userId);
+
+        if(volunteer == null) {
+            throw new BusinessException("User is found but volunteer data is missing.");
+        }
+
+        List<AirportPickupPreferenceDTO> updatedAirportPickupPreferences = request.getAirportPickupPreferences();
+        List<Student> newPreferredStudents = new ArrayList<Student>();
+
+        for (AirportPickupPreferenceDTO airportPickupPreferenceDTO : updatedAirportPickupPreferences) {
+            Long studentUserId = airportPickupPreferenceDTO.getStudentUserId();
+
+            Student student = studentService.getStudentByUserId(studentUserId);
+            newPreferredStudents.add(student);
+        }
+
+        volunteerService.updateAirportPickupPreferences(volunteer, newPreferredStudents);
+        
+        return ResponseHandler.generateResponse(new MessageReponse("Airport Pickup Preferences updated successfully."));
+    }
+
+    @PutMapping("/updateAirportPickupAssignments/{userId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @Transactional
+    public ResponseEntity<?> updateAirportPickupAssignments(@PathVariable(required=true, name="userId") Long userId, @Valid @RequestBody UpdateVolunteerAirportPickupAssignmentsRequest request) {
+        User authedUser = sessionService.getAuthedUser();
+
+        if(authedUser.isVolunteer() && !authedUser.getId().equals(userId)) {
+            throw new CustomAccessDeniedException("You are not authorized to modify this resource.");
+        }
+
+        Volunteer volunteer = volunteerService.getVolunteerByUserId(userId);
+
+        if(volunteer == null) {
+            throw new BusinessException("User is found but volunteer data is missing.");
+        }
+
+        List<AirportPickupAssignmentDTO> updatedAirportPickupAssignments = request.getAirportPickupAssignments();
+        List<Student> newAssignedStudents = new ArrayList<Student>();
+
+        for (AirportPickupAssignmentDTO airportPickupAssignmentDTO : updatedAirportPickupAssignments) {
+            Long studentUserId = airportPickupAssignmentDTO.getStudentUserId();
+
+            Student student = studentService.getStudentByUserId(studentUserId);
+            newAssignedStudents.add(student);
+        }
+
+        volunteerService.updateAirportPickupAssignments(volunteer, newAssignedStudents);
+        
+        return ResponseHandler.generateResponse(new MessageReponse("Airport Pickup Assignments updated successfully."));
     }
 
 
