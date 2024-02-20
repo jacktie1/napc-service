@@ -20,4 +20,13 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
 
     @Query("SELECT s FROM Student s WHERE s.needsAirportPickup = true AND s.hasFlightInfo = true")
     List<Student> findStudentsWithAirportPickupNeeds();
+
+    // get students who:
+    // 1. needs_temp_housing = true
+    // 3. has no temp_housing_assignment
+    @Query("SELECT s FROM Student s LEFT JOIN s.tempHousingAssignment tha WHERE s.needsTempHousing = true AND tha.id IS NULL")
+    List<Student> findUnassignedStudentsWithTempHousingNeeds();
+
+    @Query("SELECT s FROM Student s WHERE s.needsTempHousing = true")
+    List<Student> findStudentsWithTempHousingNeeds();
 }

@@ -32,6 +32,9 @@ public class StudentDTO {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private AirportPickupAssignmentDTO airportPickupAssignment;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private TempHousingAssignmentDTO tempHousingAssignment;
+
     public StudentDTO() {
     }
 
@@ -86,6 +89,10 @@ public class StudentDTO {
         return airportPickupAssignment;
     }
 
+    public TempHousingAssignmentDTO getTempHousingAssignment() {
+        return tempHousingAssignment;
+    }
+
     public void setStudentId(Long studentId) {
         this.studentId = studentId;
     }
@@ -116,6 +123,10 @@ public class StudentDTO {
 
     public void setAirportPickupAssignment(AirportPickupAssignmentDTO airportPickupAssignment) {
         this.airportPickupAssignment = airportPickupAssignment;
+    }
+
+    public void setTempHousingAssignment(TempHousingAssignmentDTO tempHousingAssignment) {
+        this.tempHousingAssignment = tempHousingAssignment;
     }
 
     public void setUserAccountFromStudentEntity(Student student) {
@@ -150,6 +161,17 @@ public class StudentDTO {
             this.setAirportPickupAssignment(emptyAirportPickupAssignment);
         }
     }
+
+    public void setTempHousingAssignmentFromStudentEntity(Student student) {
+        if (student.getTempHousingAssignment() != null) {
+            this.setTempHousingAssignment(new TempHousingAssignmentDTO(student.getTempHousingAssignment()));
+        } else {
+            TempHousingAssignmentDTO emptyTempHousingAssignment = new TempHousingAssignmentDTO();
+            this.setTempHousingAssignment(emptyTempHousingAssignment);
+        }
+    }
+
+
 
 
 }

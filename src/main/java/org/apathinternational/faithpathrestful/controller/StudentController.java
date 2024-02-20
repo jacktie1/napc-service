@@ -21,6 +21,7 @@ import org.apathinternational.faithpathrestful.model.request.UpdateStudentAirpor
 import org.apathinternational.faithpathrestful.model.request.UpdateStudentCommentRequest;
 import org.apathinternational.faithpathrestful.model.request.UpdateStudentFlightInfoRequest;
 import org.apathinternational.faithpathrestful.model.request.UpdateStudentProfileRequest;
+import org.apathinternational.faithpathrestful.model.request.UpdateStudentTempHousingAssignmentRequest;
 import org.apathinternational.faithpathrestful.model.request.UpdateStudentTempHousingRequest;
 import org.apathinternational.faithpathrestful.model.response.GetStudentResponse;
 import org.apathinternational.faithpathrestful.model.response.GetStudentsResponse;
@@ -282,6 +283,74 @@ public class StudentController {
         return ResponseHandler.generateResponse(response);
     }
 
+    @GetMapping("/getTempHousingNeeds")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_VOLUNTEER')")
+    public ResponseEntity<?> getTempHousingNeeds() {
+        User authedUser = sessionService.getAuthedUser();
+
+        List<Student> students;
+
+        if(authedUser.isAdmin()){
+            // not to check the assignment start
+            // include the assigned students
+            students = studentService.getStudentsWithTempHousingNeeds(false, true);
+        } else if (authedUser.isVolunteer()) {
+            // to check the assignment start
+            // not to include the assigned students
+            students = studentService.getStudentsWithTempHousingNeeds(true, false);
+        } else  {
+            throw new CustomAccessDeniedException("You are not authorized to access this resource.");
+        }
+
+        List<StudentDTO> studentDTOs = new ArrayList<StudentDTO>();
+
+        for(Student student : students)
+        {
+            StudentDTO studentDTO;
+
+            if(authedUser.isAdmin()) {
+                studentDTO = new StudentDTO(student);
+
+                studentDTO.setTempHousingAssignmentFromStudentEntity(student);
+                studentDTOs.add(studentDTO);
+            }
+            // only return the necessary information for the volunteer
+            else if (authedUser.isVolunteer()) {
+                studentDTO = new StudentDTO();
+
+                UserAccountDTO userAccount = new UserAccountDTO();
+                StudentFlightInfoDTO studentFlightInfo = new StudentFlightInfoDTO(student);
+                StudentProfileDTO studentProfile = new StudentProfileDTO();
+                
+                userAccount.setUserId(student.getUser().getId());
+    
+                if(student.getMajorReference() != null)
+                {
+                    studentProfile.setMajorReferenceId(student.getMajorReference().getId());
+                }
+                else
+                {
+                    studentProfile.setCustomMajor(student.getCustomMajor());
+                }
+    
+                studentProfile.setIsNewStudent(student.getIsNewStudent());
+    
+                studentDTO.setUserAccount(userAccount);
+                studentDTO.setStudentProfile(studentProfile);
+                studentDTO.setStudentFlightInfo(studentFlightInfo);
+
+                studentDTOs.add(studentDTO);
+            } else {
+                throw new CustomAccessDeniedException("You are not authorized to access this resource.");
+            }
+        }
+
+        GetStudentsResponse response = new GetStudentsResponse();
+
+        response.setStudents(studentDTOs);
+
+        return ResponseHandler.generateResponse(response);
+    }
 
     @GetMapping("/getProfile/{userId}")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STUDENT')")
@@ -568,6 +637,35 @@ public class StudentController {
         } 
 
         studentService.updateAirportPickupAssignment(student, volunteerUser);
+
+        return ResponseHandler.generateResponse(new MessageReponse("Airport pickup assignment updated successfully."));
+    }
+
+    @PutMapping("/updateTempHousingAssignment/{userId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @Transactional
+    public ResponseEntity<?> updateTempHousingAssignment(@PathVariable(required=true, name="userId") Long userId, @Valid @RequestBody UpdateStudentTempHousingAssignmentRequest request) {
+        User authedUser = sessionService.getAuthedUser();
+
+        if(!authedUser.isAdmin()) {
+            throw new CustomAccessDeniedException("You are not authorized to modify this resource.");
+        }
+
+        Student student = studentService.getStudentByUserId(userId);
+
+        if(student == null) {
+            throw new BusinessException("User is found but student data is missing.");
+        }
+
+        Long volunteerUserId = request.getVolunteerUserId();
+
+        Volunteer volunteerUser = null;
+
+        if(volunteerUserId != null) {
+            volunteerUser = volunteerService.getVolunteerByUserId(volunteerUserId);
+        } 
+
+        studentService.updateTempHousingAssignment(student, volunteerUser);
 
         return ResponseHandler.generateResponse(new MessageReponse("Airport pickup assignment updated successfully."));
     }

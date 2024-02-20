@@ -11,6 +11,7 @@ import org.apathinternational.faithpathrestful.entity.Management;
 import org.apathinternational.faithpathrestful.entity.Reference;
 import org.apathinternational.faithpathrestful.entity.Role;
 import org.apathinternational.faithpathrestful.entity.Student;
+import org.apathinternational.faithpathrestful.entity.TempHousingAssignment;
 import org.apathinternational.faithpathrestful.entity.User;
 import org.apathinternational.faithpathrestful.entity.Volunteer;
 import org.apathinternational.faithpathrestful.repository.StudentRepository;
@@ -159,6 +160,34 @@ public class StudentService {
         }
     }
 
+    public List<Student> getStudentsWithTempHousingNeeds(Boolean checkAssignmentStart, Boolean includeAssigned) {
+        // Get the management to check if the assignment has started
+        if(checkAssignmentStart)
+        {   
+            Management management = managementService.getManagement();
+
+            if(management == null)
+            {
+                throw new BusinessException("Management not found. Please check the management and try again.");
+            }
+
+            if(!management.getDoesAssignmentStart())
+            {
+                List<Student> emptyList = List.of();
+                return emptyList;
+            }
+        }
+
+        if(includeAssigned)
+        {
+            return studentRepository.findStudentsWithTempHousingNeeds();
+        }
+        else
+        {
+            return studentRepository.findUnassignedStudentsWithTempHousingNeeds();
+        }
+    }
+
     public Student getStudentByUserId(Long userId) {
         User studentUser = userService.getUserById(userId);
 
@@ -193,7 +222,24 @@ public class StudentService {
         studentRepository.save(student);
     }
 
+    public void updateTempHousingAssignment(Student student, Volunteer newAssignedVolunteer) {
+        if(newAssignedVolunteer == null)
+        {
+            student.setTempHousingAssignment(null);
+        }
+        else
+        {
+            TempHousingAssignment newTempHousingAssignment = new TempHousingAssignment();
+            newTempHousingAssignment.setStudent(student);
+            newTempHousingAssignment.setVolunteer(newAssignedVolunteer);
+            student.setTempHousingAssignment(newTempHousingAssignment);
+        }
+        
+        studentRepository.save(student);
+    }
+
     public void deleteStudents(List<Long> studentIds) {
         studentRepository.deleteAllById(studentIds);
     }
+
 }
