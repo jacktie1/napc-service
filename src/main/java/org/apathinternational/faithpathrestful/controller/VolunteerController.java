@@ -9,11 +9,13 @@ import org.apathinternational.faithpathrestful.entity.AirportPickupAssignment;
 import org.apathinternational.faithpathrestful.entity.AirportPickupPreference;
 import org.apathinternational.faithpathrestful.entity.Reference;
 import org.apathinternational.faithpathrestful.entity.Student;
+import org.apathinternational.faithpathrestful.entity.TempHousingAssignment;
 import org.apathinternational.faithpathrestful.entity.User;
 import org.apathinternational.faithpathrestful.entity.UserSecurityQuestion;
 import org.apathinternational.faithpathrestful.entity.Volunteer;
 import org.apathinternational.faithpathrestful.model.entityDTO.AirportPickupAssignmentDTO;
 import org.apathinternational.faithpathrestful.model.entityDTO.AirportPickupPreferenceDTO;
+import org.apathinternational.faithpathrestful.model.entityDTO.TempHousingAssignmentDTO;
 import org.apathinternational.faithpathrestful.model.entityDTO.UserAccountDTO;
 import org.apathinternational.faithpathrestful.model.entityDTO.VolunteerAirportPickupDTO;
 import org.apathinternational.faithpathrestful.model.entityDTO.VolunteerDTO;
@@ -24,9 +26,11 @@ import org.apathinternational.faithpathrestful.model.request.UpdateVolunteerAirp
 import org.apathinternational.faithpathrestful.model.request.UpdateAirportPickupPreferencesRequest;
 import org.apathinternational.faithpathrestful.model.request.UpdateVolunteerAirportPickupRequest;
 import org.apathinternational.faithpathrestful.model.request.UpdateVolunteerProfileRequest;
+import org.apathinternational.faithpathrestful.model.request.UpdateVolunteerTempHousingAssignmentsRequest;
 import org.apathinternational.faithpathrestful.model.request.UpdateVolunteerTempHousingRequest;
 import org.apathinternational.faithpathrestful.model.response.GetAirportPickupAssignmentsResponse;
 import org.apathinternational.faithpathrestful.model.response.GetAirportPickupPreferencesResponse;
+import org.apathinternational.faithpathrestful.model.response.GetTempHousingAssignmentsResponse;
 import org.apathinternational.faithpathrestful.model.response.GetVolunteerResponse;
 import org.apathinternational.faithpathrestful.model.response.GetVolunteersResponse;
 import org.apathinternational.faithpathrestful.model.response.MessageReponse;
@@ -386,6 +390,43 @@ public class VolunteerController {
         return ResponseHandler.generateResponse(response);
     }
 
+    @GetMapping("/getTempHousingAssignments/{userId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_VOLUNTEER')")
+    public ResponseEntity<?> getTempHousingAssignments(
+        @PathVariable(required=true, name="userId") Long userId,
+        @RequestParam(required = false, defaultValue = "false") Boolean includeStudentDetails
+        ) {
+        User authedUser = sessionService.getAuthedUser();
+
+        if(authedUser.isVolunteer() && !authedUser.getId().equals(userId)) {
+            throw new CustomAccessDeniedException("You are not authorized to view this volunteer.");
+        }
+
+        Volunteer volunteer = volunteerService.getVolunteerByUserId(userId);
+
+        if(volunteer == null) {
+            throw new BusinessException("User is found but volunteer data is missing.");
+        }
+
+        GetTempHousingAssignmentsResponse response = new GetTempHousingAssignmentsResponse();
+
+        List<TempHousingAssignmentDTO> tempHousingAssignmentDTOs = new ArrayList<TempHousingAssignmentDTO>();
+
+        for (TempHousingAssignment tempHousingAssignment : volunteer.getTempHousingAssignments()) {
+            TempHousingAssignmentDTO tempHousingAssignmentDTO = new TempHousingAssignmentDTO(tempHousingAssignment);
+
+            if(includeStudentDetails) {
+                tempHousingAssignmentDTO.setStudentFromStudentEntity(tempHousingAssignment.getStudent());
+            }
+            
+            tempHousingAssignmentDTOs.add(tempHousingAssignmentDTO);
+        }
+
+        response.setTempHousingAssignments(tempHousingAssignmentDTOs);
+
+        return ResponseHandler.generateResponse(response);
+    }
+
     @PutMapping("/updateProfile/{userId}")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_VOLUNTEER')")
     @Transactional
@@ -545,6 +586,37 @@ public class VolunteerController {
         }
 
         volunteerService.updateAirportPickupAssignments(volunteer, newAssignedStudents);
+        
+        return ResponseHandler.generateResponse(new MessageReponse("Airport Pickup Assignments updated successfully."));
+    }
+
+    @PutMapping("/updateTempHousingAssignments/{userId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @Transactional
+    public ResponseEntity<?> updateTempHousingAssignments(@PathVariable(required=true, name="userId") Long userId, @Valid @RequestBody UpdateVolunteerTempHousingAssignmentsRequest request) {
+        User authedUser = sessionService.getAuthedUser();
+
+        if(authedUser.isVolunteer() && !authedUser.getId().equals(userId)) {
+            throw new CustomAccessDeniedException("You are not authorized to modify this resource.");
+        }
+
+        Volunteer volunteer = volunteerService.getVolunteerByUserId(userId);
+
+        if(volunteer == null) {
+            throw new BusinessException("User is found but volunteer data is missing.");
+        }
+
+        List<TempHousingAssignmentDTO> updatedTempHousingAssignments = request.getTempHousingAssignments();
+        List<Student> newAssignedStudents = new ArrayList<Student>();
+
+        for (TempHousingAssignmentDTO airportPickupAssignmentDTO : updatedTempHousingAssignments) {
+            Long studentUserId = airportPickupAssignmentDTO.getStudentUserId();
+
+            Student student = studentService.getStudentByUserId(studentUserId);
+            newAssignedStudents.add(student);
+        }
+
+        volunteerService.updateTempHousingAssignments(volunteer, newAssignedStudents);
         
         return ResponseHandler.generateResponse(new MessageReponse("Airport Pickup Assignments updated successfully."));
     }

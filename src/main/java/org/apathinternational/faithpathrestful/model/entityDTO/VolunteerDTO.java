@@ -40,7 +40,6 @@ public class VolunteerDTO {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<TempHousingAssignmentDTO> tempHousingAssignments;
 
-
     public VolunteerDTO() {
     }
 

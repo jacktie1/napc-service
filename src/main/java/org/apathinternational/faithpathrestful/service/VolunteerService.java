@@ -10,6 +10,7 @@ import org.apathinternational.faithpathrestful.entity.AirportPickupAssignment;
 import org.apathinternational.faithpathrestful.entity.AirportPickupPreference;
 import org.apathinternational.faithpathrestful.entity.Role;
 import org.apathinternational.faithpathrestful.entity.Student;
+import org.apathinternational.faithpathrestful.entity.TempHousingAssignment;
 import org.apathinternational.faithpathrestful.entity.Volunteer;
 import org.apathinternational.faithpathrestful.entity.User;
 import org.apathinternational.faithpathrestful.repository.VolunteerRepository;
@@ -165,6 +166,54 @@ public class VolunteerService {
             airportPickupAssignmentToAdd.setStudent(student);
             airportPickupAssignmentToAdd.setVolunteer(volunteer);
             currentAirportPickupAssignments.add(airportPickupAssignmentToAdd);
+        }
+
+        volunteerRepository.save(volunteer);
+    }
+
+    public void updateTempHousingAssignments(Volunteer volunteer, List<Student> newAssignedStudents) {
+        // Get the new preference list
+        // Use HashSet and HashMap to make some operations O(1) instead of O(n)
+        HashSet<Long> newAssignedStudentIds = new HashSet<Long>();
+        Map<Long, Student> newAssignedStudentMap = new HashMap<Long, Student>();
+
+        for (Student student : newAssignedStudents) {
+            newAssignedStudentIds.add(student.getId());
+            newAssignedStudentMap.put(student.getId(), student);
+        }
+        
+        // Get the current preference list
+        // Use HashSet and HashMap to make some operations O(1) instead of O(n)
+        HashSet<Long> currentAssignedStudentIds = new HashSet<Long>();
+        Map<Long, TempHousingAssignment> currentAssignedStudentMap = new HashMap<Long, TempHousingAssignment>();
+
+        List<TempHousingAssignment> currentTempHousingAssignments = volunteer.getTempHousingAssignments();
+
+        for (TempHousingAssignment tempHousingAssignment : currentTempHousingAssignments) {
+            currentAssignedStudentIds.add(tempHousingAssignment.getStudent().getId());
+            currentAssignedStudentMap.put(tempHousingAssignment.getStudent().getId(), tempHousingAssignment);
+        }
+
+        HashSet<Long> studentsToRemove = new HashSet<Long>(currentAssignedStudentIds);
+        studentsToRemove.removeAll(newAssignedStudentIds);
+
+        for (Long studentId : studentsToRemove) {
+            TempHousingAssignment tempHousingAssignmentToRemove = currentAssignedStudentMap.get(studentId);
+            // Remove the assignment from both the student and the volunteer to make sure the relationship is orphaned
+            // and thus removed
+            tempHousingAssignmentToRemove.getStudent().setTempHousingAssignment(null);
+            currentTempHousingAssignments.remove(tempHousingAssignmentToRemove);
+        }
+
+        HashSet<Long> studentsToAdd = new HashSet<Long>(newAssignedStudentIds);
+        studentsToAdd.removeAll(currentAssignedStudentIds);
+
+        for (Long studentId : studentsToAdd) {
+            Student student = newAssignedStudentMap.get(studentId);
+            TempHousingAssignment tempHousingAssignmentToAdd = new TempHousingAssignment();
+            tempHousingAssignmentToAdd.setStudent(student);
+            tempHousingAssignmentToAdd.setVolunteer(volunteer);
+            currentTempHousingAssignments.add(tempHousingAssignmentToAdd);
         }
 
         volunteerRepository.save(volunteer);
