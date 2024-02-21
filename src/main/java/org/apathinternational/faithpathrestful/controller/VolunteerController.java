@@ -178,13 +178,13 @@ public class VolunteerController {
         @RequestParam(required = false, defaultValue = "false") Boolean includeAirportPickupPreferences,
         @RequestParam(required = false, defaultValue = "false") Boolean includeTempHousingAssignments,
         @RequestParam(required = false, defaultValue = "false") Boolean includeAirportPickupAssignments,
+        @RequestParam(required = false, defaultValue = "false") Boolean excludeDisabled,
         @RequestParam(required = false, defaultValue = "false") Boolean providesAirportPickup,
         @RequestParam(required = false, defaultValue = "false") Boolean providesTempHousing
         ) {
         List<Volunteer> volunteers = volunteerService.getAllVolunteers();
 
-        // If volunteers that provide airport pickup or temp housing are requested, we need to remove the ones that are not enabled
-        if(providesAirportPickup == true || providesTempHousing == true) {
+        if(excludeDisabled == true) {
             volunteers.removeIf(volunteer -> volunteer.getUser().getEnabled() == false);
         }
 

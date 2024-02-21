@@ -43,6 +43,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.Valid;
@@ -173,12 +174,47 @@ public class StudentController {
 
     @GetMapping("/getStudents")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> getStudents() {
+    public ResponseEntity<?> getStudents(
+        @RequestParam(required = false, defaultValue = "false") Boolean includeTempHousingAssignment,
+        @RequestParam(required = false, defaultValue = "false") Boolean includeAirportPickupAssignment,
+        @RequestParam(required = false, defaultValue = "false") Boolean excludeDisabled,
+        @RequestParam(required = false, defaultValue = "false") Boolean needsAirportPickup,
+        @RequestParam(required = false, defaultValue = "false") Boolean needsTempHousing
+    ) {
         List<Student> students = studentService.getAllStudents();
+
+        if(excludeDisabled == true) {
+            students.removeIf(student -> student.getUser().getEnabled() == false);
+        }
+
+        if(needsAirportPickup == true) {
+            students.removeIf(student -> student.getNeedsAirportPickup() == false);
+        }
+
+        if(needsTempHousing == true) {
+            students.removeIf(student -> student.getNeedsTempHousing() == false);
+        }
 
         GetStudentsResponse response = new GetStudentsResponse();
 
-        response.setStudentsFromStudentList(students);
+        List<StudentDTO> studentDTOs = new ArrayList<StudentDTO>();
+
+        for(Student student : students)
+        {
+            StudentDTO studentDTO = new StudentDTO(student);
+
+            if(includeAirportPickupAssignment == true) {
+                studentDTO.setAirportPickupAssignmentFromStudentEntity(student);
+            }
+
+            if(includeTempHousingAssignment == true) {
+                studentDTO.setTempHousingAssignmentFromStudentEntity(student);
+            }
+
+            studentDTOs.add(studentDTO);
+        }
+
+        response.setStudents(studentDTOs);
 
         return ResponseHandler.generateResponse(response);
     }
