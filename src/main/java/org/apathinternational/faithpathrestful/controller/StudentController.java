@@ -5,16 +5,19 @@ import java.util.List;
 
 import org.apathinternational.faithpathrestful.common.exception.BusinessException;
 import org.apathinternational.faithpathrestful.common.exception.CustomAccessDeniedException;
+import org.apathinternational.faithpathrestful.entity.AirportPickupAssignment;
 import org.apathinternational.faithpathrestful.entity.Reference;
 import org.apathinternational.faithpathrestful.entity.Student;
 import org.apathinternational.faithpathrestful.entity.User;
 import org.apathinternational.faithpathrestful.entity.UserSecurityQuestion;
 import org.apathinternational.faithpathrestful.entity.Volunteer;
+import org.apathinternational.faithpathrestful.model.entityDTO.AirportPickupAssignmentDTO;
 import org.apathinternational.faithpathrestful.model.entityDTO.StudentCommentDTO;
 import org.apathinternational.faithpathrestful.model.entityDTO.StudentDTO;
 import org.apathinternational.faithpathrestful.model.entityDTO.StudentFlightInfoDTO;
 import org.apathinternational.faithpathrestful.model.entityDTO.StudentProfileDTO;
 import org.apathinternational.faithpathrestful.model.entityDTO.StudentTempHousingDTO;
+import org.apathinternational.faithpathrestful.model.entityDTO.TempHousingAssignmentDTO;
 import org.apathinternational.faithpathrestful.model.entityDTO.UserAccountDTO;
 import org.apathinternational.faithpathrestful.model.request.RegisterStudentRequest;
 import org.apathinternational.faithpathrestful.model.request.UpdateStudentAirportPickupAssignmentRequest;
@@ -481,6 +484,86 @@ public class StudentController {
         GetStudentResponse response = new GetStudentResponse();
 
         response.setStudentComment(student);
+
+        return ResponseHandler.generateResponse(response);
+    }
+
+    @GetMapping("/getAirportPickupAssignment/{userId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STUDENT')")
+    public ResponseEntity<?> getAirportPickupAssignment(@PathVariable(required=true, name="userId") Long userId) {
+        User authedUser = sessionService.getAuthedUser();
+
+        if(authedUser.isStudent() && !authedUser.getId().equals(userId)) {
+            throw new CustomAccessDeniedException("You are not authorized to access this resource.");
+        }
+
+        Student student = studentService.getStudentByUserId(userId);
+
+        if(student == null) {
+            throw new BusinessException("User is found but student data is missing.");
+        }
+
+        StudentDTO studentDTO = new StudentDTO(student);
+
+        AirportPickupAssignmentDTO airportPickupAssignmentDTO = new AirportPickupAssignmentDTO();
+
+        if(student.getAirportPickupAssignment() != null)
+        {
+            airportPickupAssignmentDTO.setStudentUserId(userId);
+            airportPickupAssignmentDTO.setVolunteerUserId(student.getAirportPickupAssignment().getVolunteer().getUser().getId());
+            airportPickupAssignmentDTO.setVolunteerFromVolunteerEntity(student.getAirportPickupAssignment().getVolunteer());
+
+            if(authedUser.isStudent()) {
+                // If the user is a student, we don't want to return the user account information
+                airportPickupAssignmentDTO.getVolunteer().setUserAccount(null);
+            }
+        }
+
+        studentDTO.setAirportPickupAssignment(airportPickupAssignmentDTO);
+
+        GetStudentResponse response = new GetStudentResponse();
+
+        response.setStudent(studentDTO);
+
+        return ResponseHandler.generateResponse(response);
+    }
+
+    @GetMapping("/getTempHousingAssignment/{userId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STUDENT')")
+    public ResponseEntity<?> getTempHousingAssignment(@PathVariable(required=true, name="userId") Long userId) {
+        User authedUser = sessionService.getAuthedUser();
+
+        if(authedUser.isStudent() && !authedUser.getId().equals(userId)) {
+            throw new CustomAccessDeniedException("You are not authorized to access this resource.");
+        }
+
+        Student student = studentService.getStudentByUserId(userId);
+
+        if(student == null) {
+            throw new BusinessException("User is found but student data is missing.");
+        }
+
+        StudentDTO studentDTO = new StudentDTO(student);
+
+        TempHousingAssignmentDTO tempHousingAssignmentDTO = new TempHousingAssignmentDTO();
+
+        if(student.getTempHousingAssignment() != null)
+        {
+            tempHousingAssignmentDTO.setStudentUserId(userId);
+            tempHousingAssignmentDTO.setVolunteerUserId(student.getTempHousingAssignment().getVolunteer().getUser().getId());
+            tempHousingAssignmentDTO.setVolunteerFromVolunteerEntity(student.getTempHousingAssignment().getVolunteer());
+
+            if(authedUser.isStudent()) {
+                // If the user is a student, we don't want to return the user account information
+                tempHousingAssignmentDTO.getVolunteer().setUserAccount(null);
+            }
+        }
+
+        studentDTO.setTempHousingAssignment(tempHousingAssignmentDTO);
+
+        GetStudentResponse response = new GetStudentResponse();
+
+        response.setStudent(studentDTO);
 
         return ResponseHandler.generateResponse(response);
     }

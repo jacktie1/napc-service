@@ -2,6 +2,7 @@ package org.apathinternational.faithpathrestful.model.entityDTO;
 
 import org.apathinternational.faithpathrestful.entity.AirportPickupAssignment;
 import org.apathinternational.faithpathrestful.entity.Student;
+import org.apathinternational.faithpathrestful.entity.Volunteer;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -15,6 +16,9 @@ public class AirportPickupAssignmentDTO {
     // Lazy field
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private StudentDTO student;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private VolunteerDTO volunteer;
 
     public AirportPickupAssignmentDTO() {
     }
@@ -36,6 +40,10 @@ public class AirportPickupAssignmentDTO {
         return student;
     }
 
+    public VolunteerDTO getVolunteer() {
+        return volunteer;
+    }
+
     public void setStudentUserId(Long studentUserId) {
         this.studentUserId = studentUserId;
     }
@@ -48,8 +56,16 @@ public class AirportPickupAssignmentDTO {
         this.student = student;
     }
 
+    public void setVolunteer(VolunteerDTO volunteer) {
+        this.volunteer = volunteer;
+    }
+
     public void setStudentFromStudentEntity(Student student) {
         this.student = new StudentDTO(student);
+    }
+
+    public void setVolunteerFromVolunteerEntity(Volunteer volunteer) {
+        this.volunteer = new VolunteerDTO(volunteer);
     }
 
 }

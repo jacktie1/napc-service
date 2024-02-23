@@ -363,6 +363,11 @@ public class VolunteerController {
 
             if(includeStudentDetails) {
                 airportPickupAssignmentDTO.setStudentFromStudentEntity(airportPickupAssignment.getStudent());
+
+                if(authedUser.isVolunteer())
+                {
+                    airportPickupAssignmentDTO.getStudent().setUserAccount(null);
+                }
             }
             
             airportPickupAssignmentDTOs.add(airportPickupAssignmentDTO);
@@ -400,6 +405,11 @@ public class VolunteerController {
 
             if(includeStudentDetails) {
                 tempHousingAssignmentDTO.setStudentFromStudentEntity(tempHousingAssignment.getStudent());
+
+                if(authedUser.isVolunteer())
+                {
+                    tempHousingAssignmentDTO.getStudent().setUserAccount(null);
+                }
             }
             
             tempHousingAssignmentDTOs.add(tempHousingAssignmentDTO);
