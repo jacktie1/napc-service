@@ -242,4 +242,18 @@ public class StudentService {
         studentRepository.deleteAllById(studentIds);
     }
 
+    public Boolean isStudentAssignedToVolunteer(Student student, Volunteer volunteer) {
+        if(student.getAirportPickupAssignment() != null && student.getAirportPickupAssignment().getVolunteer().getId() == volunteer.getId())
+        {
+            return true;
+        }
+
+        if(student.getTempHousingAssignment() != null && student.getTempHousingAssignment().getVolunteer().getId() == volunteer.getId())
+        {
+            return true;
+        }
+
+        return false;
+    }
+
 }

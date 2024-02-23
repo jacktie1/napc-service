@@ -220,7 +220,7 @@ public class StudentController {
     }
 
     @GetMapping("/getStudent/{userId}")
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STUDENT')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STUDENT') or hasRole('ROLE_VOLUNTEER')")
     public ResponseEntity<?> getStudent(@PathVariable(required=true, name="userId") Long userId) {
         User authedUser = sessionService.getAuthedUser();
 
@@ -232,6 +232,15 @@ public class StudentController {
 
         if(student == null) {
             throw new BusinessException("User is found but student data is missing.");
+        }
+        
+        if(authedUser.isVolunteer())
+        {
+            Volunteer authedVolunteer = volunteerService.getVolunteerByUserId(authedUser.getId());     
+            
+            if(studentService.isStudentAssignedToVolunteer(student, authedVolunteer) == false) {
+                throw new CustomAccessDeniedException("You are not authorized to view this student.");
+            }
         }
 
         StudentDTO studentDTO = new StudentDTO(student);

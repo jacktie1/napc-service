@@ -413,5 +413,5 @@ public class Student extends AuditableEntity {
     public void setTempHousingAssignment(TempHousingAssignment tempHousingAssignment) {
         this.tempHousingAssignment = tempHousingAssignment;
     }
-    
+  
 }

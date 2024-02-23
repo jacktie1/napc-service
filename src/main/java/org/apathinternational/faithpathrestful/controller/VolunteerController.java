@@ -232,35 +232,18 @@ public class VolunteerController {
             throw new CustomAccessDeniedException("You are not authorized to view this volunteer.");
         }
 
-        if(authedUser.isStudent()) {
-            Student student = authedUser.getStudent();
-            
-            List<Volunteer> assignedVolunteers = new ArrayList<Volunteer>();
-    
-            if(student.getAirportPickupAssignment() == null) {
-                assignedVolunteers.add(student.getAirportPickupAssignment().getVolunteer());
-            }
-
-            if(student.getTempHousingAssignment() == null) {
-                assignedVolunteers.add(student.getTempHousingAssignment().getVolunteer());
-            }
-
-            if(assignedVolunteers.size() == 0) {
-                throw new BusinessException("Student is not assigned to any volunteer.");
-            }
-
-            Boolean isStudentAssignedToRequestedVolunteer = assignedVolunteers.stream().anyMatch(volunteer -> volunteer.getUser().getId().equals(userId));
-
-            if(!isStudentAssignedToRequestedVolunteer)
-            {
-                throw new CustomAccessDeniedException("You are not authorized to view this volunteer.");
-            }
-        }
-
         Volunteer volunteer = volunteerService.getVolunteerByUserId(userId);
 
         if(volunteer == null) {
             throw new BusinessException("User is found but volunteer data is missing.");
+        }
+
+        if(authedUser.isStudent()) {
+            Student authedStudent = authedUser.getStudent();
+
+            if(studentService.isStudentAssignedToVolunteer(authedStudent, volunteerService.getVolunteerByUserId(userId))) {
+                throw new CustomAccessDeniedException("You are not authorized to view this volunteer.");
+            }
         }
 
         VolunteerDTO volunteerDTO = new VolunteerDTO(volunteer);
