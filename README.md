@@ -13,3 +13,23 @@ To run the application locally in development mode, you will need Java 17 JDK an
 
 ## Server Startup
 Under the project directory, run `./mvnw spring-boot:run`
+
+
+# Deployment Tips
+
+## Prod Profile
+* The profile needs to be set to prod - `spring.profiles.active = prod`
+
+## Log Directory
+* The prod log will be saved at the configured directory:
+    * `spring.logback.logdir={log-directory}`
+    * Rotated log will be saved at {logdir}/archived/ with a 30-day maxHistory
+    * Make sure that the log directories have the correct permissions
+    * See more details by checking `(...)resources/logback-spring.xml`
+
+## Email Server Setup
+* The following configs need to be set properly to enable email sending:
+    * `apath.email.enabled=true`
+    * `spring.mail.host={smtp.provider.com}`
+    * `spring.mail.username={your_email@example.com}`
+    * `spring.mail.password={your_password}`
