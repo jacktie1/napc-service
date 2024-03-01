@@ -1,5 +1,6 @@
 package org.apathinternational.faithpathrestful.service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -29,6 +30,13 @@ public class VolunteerService {
 
     @Autowired
     private UserService userService;
+
+    private final EmailService emailService;
+
+    @Autowired
+    public VolunteerService(EmailService emailService) {
+        this.emailService = emailService;
+    }
 
     public Volunteer createVolunteer(Volunteer volunteer) {
         Map<String, String> fieldErrors = new HashMap<String, String>();
@@ -120,10 +128,17 @@ public class VolunteerService {
             currentAirportPickupPreferences.add(airportPickupPreferenceToAdd);
         }
 
+        if(studentsToAdd.isEmpty() && studentsToRemove.isEmpty())
+        {
+            return;
+        }
+
         volunteerRepository.save(volunteer);
     }
 
     public void updateAirportPickupAssignments(Volunteer volunteer, List<Student> newAssignedStudents) {
+        List<User> usersToNotify = new ArrayList<User>();
+
         // Get the new preference list
         // Use HashSet and HashMap to make some operations O(1) instead of O(n)
         HashSet<Long> newAssignedStudentIds = new HashSet<Long>();
@@ -155,6 +170,8 @@ public class VolunteerService {
             // and thus removed
             airportPickupAssignmentToRemove.getStudent().setAirportPickupAssignment(null);
             currentAirportPickupAssignments.remove(airportPickupAssignmentToRemove);
+
+            usersToNotify.add(airportPickupAssignmentToRemove.getStudent().getUser());
         }
 
         HashSet<Long> studentsToAdd = new HashSet<Long>(newAssignedStudentIds);
@@ -166,12 +183,25 @@ public class VolunteerService {
             airportPickupAssignmentToAdd.setStudent(student);
             airportPickupAssignmentToAdd.setVolunteer(volunteer);
             currentAirportPickupAssignments.add(airportPickupAssignmentToAdd);
+
+            usersToNotify.add(student.getUser());
         }
 
-        volunteerRepository.save(volunteer);
+        if(studentsToAdd.isEmpty() && studentsToRemove.isEmpty())
+        {
+            return;
+        }
+
+        usersToNotify.add(volunteer.getUser());
+
+        for (User user : usersToNotify) {
+            emailService.sendAirportPickupAssignmentUpdateMessage(user);
+        }
     }
 
     public void updateTempHousingAssignments(Volunteer volunteer, List<Student> newAssignedStudents) {
+        List<User> usersToNotify = new ArrayList<User>();
+
         // Get the new preference list
         // Use HashSet and HashMap to make some operations O(1) instead of O(n)
         HashSet<Long> newAssignedStudentIds = new HashSet<Long>();
@@ -203,6 +233,8 @@ public class VolunteerService {
             // and thus removed
             tempHousingAssignmentToRemove.getStudent().setTempHousingAssignment(null);
             currentTempHousingAssignments.remove(tempHousingAssignmentToRemove);
+
+            usersToNotify.add(tempHousingAssignmentToRemove.getStudent().getUser());
         }
 
         HashSet<Long> studentsToAdd = new HashSet<Long>(newAssignedStudentIds);
@@ -214,8 +246,21 @@ public class VolunteerService {
             tempHousingAssignmentToAdd.setStudent(student);
             tempHousingAssignmentToAdd.setVolunteer(volunteer);
             currentTempHousingAssignments.add(tempHousingAssignmentToAdd);
+
+            usersToNotify.add(student.getUser());
         }
 
+        if(studentsToAdd.isEmpty() && studentsToRemove.isEmpty())
+        {
+            return;
+        }
+
+        usersToNotify.add(volunteer.getUser());
+
         volunteerRepository.save(volunteer);
+
+        for (User user : usersToNotify) {
+            emailService.sendTempHousingAssignmentUpdateMessage(user);
+        }
     }
 }

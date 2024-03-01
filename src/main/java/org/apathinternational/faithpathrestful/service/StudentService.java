@@ -1,5 +1,6 @@
 package org.apathinternational.faithpathrestful.service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +36,13 @@ public class StudentService {
 
     @Autowired
     private UserService userService;
+
+    private final EmailService emailService;
+
+    @Autowired
+    public StudentService(EmailService emailService) {
+        this.emailService = emailService;
+    }
 
     public Student getStudentById(Long studentId) {
         return studentRepository.findById(studentId).orElse(null);
@@ -207,6 +215,29 @@ public class StudentService {
     }
 
     public void updateAirportPickupAssignment(Student student, Volunteer newAssignedVolunteer) {
+        List<User> usersToNotify = new ArrayList<User>();
+
+        AirportPickupAssignment existingAirportPickupAssignment = student.getAirportPickupAssignment();
+
+        // no change
+        if(existingAirportPickupAssignment == null && newAssignedVolunteer == null)
+        {
+            return;
+        }
+
+        // no change
+        if(existingAirportPickupAssignment != null && newAssignedVolunteer != null && existingAirportPickupAssignment.getVolunteer().getId() == newAssignedVolunteer.getId())
+        {
+            return;
+        }
+
+        usersToNotify.add(student.getUser());
+
+        if(existingAirportPickupAssignment != null)
+        {
+            usersToNotify.add(existingAirportPickupAssignment.getVolunteer().getUser());
+        }
+
         if(newAssignedVolunteer == null)
         {
             student.setAirportPickupAssignment(null);
@@ -217,12 +248,42 @@ public class StudentService {
             newAirportPickupAssignment.setStudent(student);
             newAirportPickupAssignment.setVolunteer(newAssignedVolunteer);
             student.setAirportPickupAssignment(newAirportPickupAssignment);
+
+            usersToNotify.add(newAssignedVolunteer.getUser());
         }
         
         studentRepository.save(student);
+
+        for(User user : usersToNotify)
+        {
+            emailService.sendAirportPickupAssignmentUpdateMessage(user);
+        }
     }
 
     public void updateTempHousingAssignment(Student student, Volunteer newAssignedVolunteer) {
+        List<User> usersToNotify = new ArrayList<User>();
+
+        TempHousingAssignment existingTempHousingAssignment = student.getTempHousingAssignment();
+
+        // no change
+        if(existingTempHousingAssignment == null && newAssignedVolunteer == null)
+        {
+            return;
+        }
+
+        // no change
+        if(existingTempHousingAssignment != null && newAssignedVolunteer != null && existingTempHousingAssignment.getVolunteer().getId() == newAssignedVolunteer.getId())
+        {
+            return;
+        }
+
+        usersToNotify.add(student.getUser());
+
+        if(existingTempHousingAssignment != null)
+        {
+            usersToNotify.add(existingTempHousingAssignment.getVolunteer().getUser());
+        }
+
         if(newAssignedVolunteer == null)
         {
             student.setTempHousingAssignment(null);
@@ -233,9 +294,16 @@ public class StudentService {
             newTempHousingAssignment.setStudent(student);
             newTempHousingAssignment.setVolunteer(newAssignedVolunteer);
             student.setTempHousingAssignment(newTempHousingAssignment);
+
+            usersToNotify.add(newAssignedVolunteer.getUser());
         }
         
         studentRepository.save(student);
+
+        for(User user : usersToNotify)
+        {
+            emailService.sendTempHousingAssignmentUpdateMessage(user);
+        }
     }
 
     public void deleteStudents(List<Long> studentIds) {

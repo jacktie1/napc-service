@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.apathinternational.faithpathrestful.common.exception.BusinessException;
 import org.apathinternational.faithpathrestful.common.exception.CustomAccessDeniedException;
-import org.apathinternational.faithpathrestful.entity.AirportPickupAssignment;
 import org.apathinternational.faithpathrestful.entity.Reference;
 import org.apathinternational.faithpathrestful.entity.Student;
 import org.apathinternational.faithpathrestful.entity.User;
