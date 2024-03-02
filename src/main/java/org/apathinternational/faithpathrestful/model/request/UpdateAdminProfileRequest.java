@@ -6,7 +6,6 @@ import jakarta.validation.constraints.NotNull;
 
 public class UpdateAdminProfileRequest {
 
-
     @NotNull
     private AdminProfileDTO volunteerProfile;
 

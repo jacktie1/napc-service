@@ -81,7 +81,7 @@ public class AdminController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @ResponseStatus(code = HttpStatus.OK)
     @Transactional
-    public ResponseEntity<?> updateManagement(@RequestBody UpdateManagementRequest request) {
+    public ResponseEntity<?> updateManagement(@Valid @RequestBody UpdateManagementRequest request) {
         Management management = managementService.getManagement();
 
         management.setDoesAssignmentStart(request.getManagement().getDoesAssignmentStart());

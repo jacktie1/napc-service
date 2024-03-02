@@ -85,4 +85,8 @@ public class UserService {
     public void deleteUsers(List<Long> userIds) {
         userRepository.deleteAllById(userIds);
     }
+
+    public void updateUser(User user) {
+        userRepository.save(user);
+    }
 }

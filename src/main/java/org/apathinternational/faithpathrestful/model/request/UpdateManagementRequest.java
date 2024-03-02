@@ -6,7 +6,6 @@ import jakarta.validation.constraints.NotNull;
 
 public class UpdateManagementRequest {
 
-
     @NotNull
     private ManagementDTO Management;
 

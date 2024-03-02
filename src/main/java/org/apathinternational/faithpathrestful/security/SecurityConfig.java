@@ -58,7 +58,8 @@ public class SecurityConfig {
                 // List all endpoints that don't need to be authenticated here
                 // The other endpoints will be authorized in each method using annotations like @PreAuthorize
                 authorize
-                    .requestMatchers("/api/auth/login").permitAll()
+                    .requestMatchers("/api/auth/**").permitAll()
+                    .requestMatchers("/api/userAccount/getAccountByUsername/*").permitAll()
                     .requestMatchers("/api/admin/getReferences").permitAll()
                     .requestMatchers("/api/admin/getManagement").permitAll()
                     .requestMatchers("/api/student/register").permitAll()

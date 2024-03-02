@@ -72,4 +72,9 @@ public class JwtTokenProvider {
 
         return null;
     }
+
+    public Long getUserIdFromToken(String token) {
+        Claims claims = Jwts.parserBuilder().setSigningKey(Keys.hmacShaKeyFor(jwtSecret.getBytes())).build().parseClaimsJws(token).getBody();
+        return Long.parseLong(claims.getSubject());
+    }
 }

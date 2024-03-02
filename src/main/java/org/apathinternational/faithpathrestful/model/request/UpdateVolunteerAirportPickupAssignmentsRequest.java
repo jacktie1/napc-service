@@ -4,7 +4,10 @@ import java.util.List;
 
 import org.apathinternational.faithpathrestful.model.entityDTO.AirportPickupAssignmentDTO;
 
+import jakarta.validation.constraints.NotNull;
+
 public class UpdateVolunteerAirportPickupAssignmentsRequest {
+    @NotNull
     private List<AirportPickupAssignmentDTO> airportPickupAssignments;
 
     public UpdateVolunteerAirportPickupAssignmentsRequest() {
