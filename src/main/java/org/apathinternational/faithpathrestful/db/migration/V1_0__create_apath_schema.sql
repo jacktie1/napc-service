@@ -32,6 +32,7 @@ CREATE TABLE IF NOT EXISTS `reference` (
     `value` VARCHAR(255) NOT NULL,
     `alternate_value` VARCHAR(255),
     `parent_reference_id` BIGINT,
+    `enabled` BOOLEAN NOT NULL DEFAULT true,
     `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `created_by` BIGINT NOT NULL DEFAULT -1,
     `modified_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
