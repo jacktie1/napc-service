@@ -6,16 +6,18 @@ public class LoginSuccessResponse {
     private String role;
     private String firstName;
     private String lastName;
+    private Boolean hasSecurityQuestions;
 
     public LoginSuccessResponse() {
     }
 
-    public LoginSuccessResponse(String token, Long userId, String role, String firstName, String lastName) {
+    public LoginSuccessResponse(String token, Long userId, String role, String firstName, String lastName, Boolean hasSecurityQuestions) {
         this.token = token;
         this.userId = userId;
         this.role = role;
         this.firstName = firstName;
         this.lastName = lastName;
+        this.hasSecurityQuestions = hasSecurityQuestions;
     }
 
     public Long getUserId() {
@@ -38,6 +40,10 @@ public class LoginSuccessResponse {
         return lastName;
     }
 
+    public Boolean getHasSecurityQuestions() {
+        return hasSecurityQuestions;
+    }
+
     public void setUserId(Long userId) {
         this.userId = userId;
     }
@@ -56,5 +62,9 @@ public class LoginSuccessResponse {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public void setHasSecurityQuestions(Boolean hasSecurityQuestions) {
+        this.hasSecurityQuestions = hasSecurityQuestions;
     }
 }

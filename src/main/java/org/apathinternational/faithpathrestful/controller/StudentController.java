@@ -102,11 +102,11 @@ public class StudentController {
         securityQuestionReference2.setId(userAccount.getSecurityQuestionReferenceId2());
         securityQuestionReference3.setId(userAccount.getSecurityQuestionReferenceId3());
         userSecurityQuestion1.setSecurityQuestionReference(securityQuestionReference1);
-        userSecurityQuestion1.setSecurityAnswer(passwordEncoder.encode(userAccount.getsecurityAnswer1().trim().toUpperCase()));
+        userSecurityQuestion1.setSecurityAnswer(passwordEncoder.encode(userAccount.getSecurityAnswer1().trim().toUpperCase()));
         userSecurityQuestion2.setSecurityQuestionReference(securityQuestionReference2);
-        userSecurityQuestion2.setSecurityAnswer(passwordEncoder.encode(userAccount.getsecurityAnswer2().trim().toUpperCase()));
+        userSecurityQuestion2.setSecurityAnswer(passwordEncoder.encode(userAccount.getSecurityAnswer2().trim().toUpperCase()));
         userSecurityQuestion3.setSecurityQuestionReference(securityQuestionReference3);
-        userSecurityQuestion3.setSecurityAnswer(passwordEncoder.encode(userAccount.getsecurityAnswer3().trim().toUpperCase()));
+        userSecurityQuestion3.setSecurityAnswer(passwordEncoder.encode(userAccount.getSecurityAnswer3().trim().toUpperCase()));
 
         List<UserSecurityQuestion> securityQuestions = new ArrayList<UserSecurityQuestion>();
         securityQuestions.add(userSecurityQuestion1);

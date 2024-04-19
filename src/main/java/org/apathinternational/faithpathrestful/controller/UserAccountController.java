@@ -7,10 +7,12 @@ import org.apathinternational.faithpathrestful.service.UserService;
 import org.apathinternational.faithpathrestful.model.entityDTO.UserAccountDTO;
 import org.apathinternational.faithpathrestful.model.request.DeletesUsersRequest;
 import org.apathinternational.faithpathrestful.model.request.UpdateUserAccountRequest;
+import org.apathinternational.faithpathrestful.model.request.UpdateUserSecurityQuestionsRequest;
 import org.apathinternational.faithpathrestful.model.response.GetUserAccountResponse;
 import org.apathinternational.faithpathrestful.model.response.MessageReponse;
 import org.apathinternational.faithpathrestful.entity.Reference;
 import org.apathinternational.faithpathrestful.entity.User;
+import org.apathinternational.faithpathrestful.entity.UserSecurityQuestion;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,7 +65,10 @@ public class UserAccountController {
             throw new BusinessException("User not found.");
         }
 
-        GetUserAccountResponse response = new GetUserAccountResponse(requestedUser);
+        UserAccountDTO userAccount = new UserAccountDTO(requestedUser);
+
+        GetUserAccountResponse response = new GetUserAccountResponse();
+        response.setUserAccount(userAccount);
 
         return ResponseHandler.generateResponse(response);
     }
@@ -141,6 +146,53 @@ public class UserAccountController {
         if(userAccount.getPassword() != null) {
             userToUpdate.setPassword(passwordEncoder.encode(userAccount.getPassword()));   
         }
+
+        return ResponseHandler.generateResponse(new MessageReponse("Account updated successfully."));
+    }
+
+    @PutMapping("/updateSecurityQuestions/{userId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STUDENT') or hasRole('ROLE_VOLUNTEER')")
+    @Transactional
+    public ResponseEntity<?> updateSecurityQuestions(@PathVariable(required=true, name="userId") Long userId, @Valid @RequestBody UpdateUserSecurityQuestionsRequest request) {
+        User authedUser = sessionService.getAuthedUser();
+
+        if(!authedUser.isAdmin() && !authedUser.getId().equals(userId)) {
+            throw new CustomAccessDeniedException("You are not authorized to modify this resource.");
+        }
+
+        User userToUpdate = userService.getUserById(userId);
+
+        if(userToUpdate == null) {
+            throw new BusinessException("User not found.");
+        }
+
+        UserSecurityQuestion userSecurityQuestion1 = new UserSecurityQuestion();
+        UserSecurityQuestion userSecurityQuestion2 = new UserSecurityQuestion();
+        UserSecurityQuestion userSecurityQuestion3 = new UserSecurityQuestion();
+
+        Reference securityQuestionReference1 = new Reference();
+        Reference securityQuestionReference2 = new Reference();
+        Reference securityQuestionReference3 = new Reference();
+
+        securityQuestionReference1.setId(request.getSecurityQuestionReferenceId1());
+        securityQuestionReference2.setId(request.getSecurityQuestionReferenceId2());
+        securityQuestionReference3.setId(request.getSecurityQuestionReferenceId3());
+        userSecurityQuestion1.setSecurityQuestionReference(securityQuestionReference1);
+        userSecurityQuestion1.setSecurityAnswer(passwordEncoder.encode(request.getSecurityAnswer1().trim().toUpperCase()));
+        userSecurityQuestion2.setSecurityQuestionReference(securityQuestionReference2);
+        userSecurityQuestion2.setSecurityAnswer(passwordEncoder.encode(request.getSecurityAnswer2().trim().toUpperCase()));
+        userSecurityQuestion3.setSecurityQuestionReference(securityQuestionReference3);
+        userSecurityQuestion3.setSecurityAnswer(passwordEncoder.encode(request.getSecurityAnswer3().trim().toUpperCase()));
+        userSecurityQuestion1.setUser(userToUpdate);
+        userSecurityQuestion2.setUser(userToUpdate);
+        userSecurityQuestion3.setUser(userToUpdate);
+
+        List<UserSecurityQuestion> securityQuestions = new ArrayList<UserSecurityQuestion>();
+        securityQuestions.add(userSecurityQuestion1);
+        securityQuestions.add(userSecurityQuestion2);
+        securityQuestions.add(userSecurityQuestion3);
+
+        userToUpdate.setSecurityQuestions(securityQuestions);
 
         return ResponseHandler.generateResponse(new MessageReponse("Account updated successfully."));
     }

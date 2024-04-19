@@ -86,7 +86,7 @@ public class UserAccountDTO {
         return securityQuestionReferenceId1;
     }
 
-    public String getsecurityAnswer1() {
+    public String getSecurityAnswer1() {
         return securityAnswer1;
     }
 
@@ -94,7 +94,7 @@ public class UserAccountDTO {
         return securityQuestionReferenceId2;
     }
 
-    public String getsecurityAnswer2() {
+    public String getSecurityAnswer2() {
         return securityAnswer2;
     }
 
@@ -102,7 +102,7 @@ public class UserAccountDTO {
         return securityQuestionReferenceId3;
     }
 
-    public String getsecurityAnswer3() {
+    public String getSecurityAnswer3() {
         return securityAnswer3;
     }
 

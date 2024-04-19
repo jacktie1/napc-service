@@ -81,8 +81,11 @@ public class AuthController {
         Long userId = authedUser.getId();
         String firstName = authedUser.getFirstName();
         String lastName = authedUser.getLastName();
+        
+        // Check if user has security questions
+        Boolean hasSecurityQuestions = authedUser.getSecurityQuestions() != null && authedUser.getSecurityQuestions().size() >= 3;
     
-        return ResponseHandler.generateResponse(new LoginSuccessResponse(token, userId, role, firstName, lastName));
+        return ResponseHandler.generateResponse(new LoginSuccessResponse(token, userId, role, firstName, lastName, hasSecurityQuestions));
     }
 
     @PostMapping("/validateUserSecurityAnswers")
