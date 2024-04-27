@@ -1,0 +1,22 @@
+alter table user drop index email_address;
+
+alter table user drop FOREIGN KEY fk_user_modified_by;
+alter table user drop FOREIGN KEY fk_user_created_by;
+alter table administrator drop FOREIGN KEY fk_administrator_modified_by;
+alter table administrator drop FOREIGN KEY fk_administrator_created_by;
+alter table airport_pickup_assignment drop FOREIGN KEY fk_airport_pickup_assignment_modified_by;
+alter table airport_pickup_assignment drop FOREIGN KEY fk_airport_pickup_assignment_created_by;
+alter table airport_pickup_preference drop FOREIGN KEY fk_airport_pickup_preference_modified_by;
+alter table airport_pickup_preference drop FOREIGN KEY fk_airport_pickup_preference_created_by;
+alter table management drop FOREIGN KEY fk_management_modified_by;
+alter table management drop FOREIGN KEY fk_management_created_by;
+alter table reference drop FOREIGN KEY fk_reference_modified_by;
+alter table reference drop FOREIGN KEY fk_reference_created_by;
+alter table student drop FOREIGN KEY fk_student_modified_by;
+alter table student drop FOREIGN KEY fk_student_created_by;
+alter table volunteer drop FOREIGN KEY fk_volunteer_modified_by;
+alter table volunteer drop FOREIGN KEY fk_volunteer_created_by;
+alter table temp_housing_assignment drop FOREIGN KEY fk_temp_housing_assignment_modified_by;
+alter table temp_housing_assignment drop FOREIGN KEY fk_temp_housing_assignment_created_by;
+alter table user_security_question drop FOREIGN KEY fk_user_security_question_modified_by;
+alter table user_security_question drop FOREIGN KEY fk_user_security_question_created_by;
