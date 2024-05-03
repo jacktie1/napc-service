@@ -88,6 +88,7 @@ public class AdminController {
         management.setStudentRegistrationStartDate(request.getManagement().getStudentRegistrationStartDate());
         management.setStudentRegistrationEndDate(request.getManagement().getStudentRegistrationEndDate());
         management.setAnnouncement(request.getManagement().getAnnouncement());
+        management.setWeekOfWelcomeStartDate(request.getManagement().getWeekOfWelcomeStartDate());
 
         return ResponseHandler.generateResponse(new MessageReponse("Management updated successfully."));
     }

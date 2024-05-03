@@ -23,6 +23,9 @@ public class ManagementDTO {
     @NotBlank
     private String announcement;
 
+    @NotBlank
+    private LocalDate weekOfWelcomeStartDate;
+
     public ManagementDTO() {
     }
 
@@ -32,14 +35,16 @@ public class ManagementDTO {
         this.studentRegistrationStartDate = management.getStudentRegistrationStartDate();
         this.studentRegistrationEndDate = management.getStudentRegistrationEndDate();
         this.announcement = management.getAnnouncement();
+        this.weekOfWelcomeStartDate = management.getWeekOfWelcomeStartDate();
     }
 
-    public ManagementDTO(Long managementId, Boolean doesAssignmentStart, LocalDate studentRegistrationStartDate, LocalDate studentRegistrationEndDate, String announcement) {
+    public ManagementDTO(Long managementId, Boolean doesAssignmentStart, LocalDate studentRegistrationStartDate, LocalDate studentRegistrationEndDate, String announcement, LocalDate weekOfWelcomeStartDate) {
         this.managementId = managementId;
         this.doesAssignmentStart = doesAssignmentStart;
         this.studentRegistrationStartDate = studentRegistrationStartDate;
         this.studentRegistrationEndDate = studentRegistrationEndDate;
         this.announcement = announcement;
+        this.weekOfWelcomeStartDate = weekOfWelcomeStartDate;
     }
 
     public Long getManagementId() {
@@ -80,6 +85,14 @@ public class ManagementDTO {
 
     public void setAnnouncement(String announcement) {
         this.announcement = announcement;
+    }
+
+    public LocalDate getWeekOfWelcomeStartDate() {
+        return weekOfWelcomeStartDate;
+    }
+
+    public void setWeekOfWelcomeStartDate(LocalDate weekOfWelcomeStartDate) {
+        this.weekOfWelcomeStartDate = weekOfWelcomeStartDate;
     }
 
 }

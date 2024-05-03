@@ -126,6 +126,7 @@ public class StudentController {
         studentUser.setWechatId(studentProfile.getWechatId());
         studentUser.setCnPhoneNumber(studentProfile.getCnPhoneNumber());
         studentUser.setUsPhoneNumber(studentProfile.getUsPhoneNumber());
+        studentUser.setAttendsWeekOfWelcome(studentProfile.getAttendsWeekOfWelcome());
         studentUser.setNeedsAirportPickup(studentFlightInfo.getNeedsAirportPickup());
         studentUser.setHasFlightInfo(studentFlightInfo.getHasFlightInfo());
         studentUser.setArrivalFlightNumber(studentFlightInfo.getArrivalFlightNumber());
@@ -601,6 +602,7 @@ public class StudentController {
         student.setWechatId(studentProfile.getWechatId());
         student.setCnPhoneNumber(studentProfile.getCnPhoneNumber());
         student.setUsPhoneNumber(studentProfile.getUsPhoneNumber());
+        student.setAttendsWeekOfWelcome(studentProfile.getAttendsWeekOfWelcome());
 
         if(studentProfile.getMajorReferenceId() != null) {
             Reference majorReference = new Reference();

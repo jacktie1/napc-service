@@ -129,6 +129,9 @@ public class Student extends AuditableEntity {
     @Column(name = "admin_comment")
     private String adminComment;
 
+    @Column(name = "attends_week_of_welcome")
+    private Boolean attendsWeekOfWelcome;
+
     @OneToOne(mappedBy = "student", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private AirportPickupAssignment airportPickupAssignment;
 
@@ -270,6 +273,10 @@ public class Student extends AuditableEntity {
         return adminComment;
     }
 
+    public Boolean getAttendsWeekOfWelcome() {
+        return attendsWeekOfWelcome;
+    }
+
     public AirportPickupAssignment getAirportPickupAssignment() {
         return airportPickupAssignment;
     }
@@ -404,6 +411,10 @@ public class Student extends AuditableEntity {
 
     public void setAdminComment(String adminComment) {
         this.adminComment = adminComment;
+    }
+
+    public void setAttendsWeekOfWelcome(Boolean attendsWeekOfWelcome) {
+        this.attendsWeekOfWelcome = attendsWeekOfWelcome;
     }
 
     public void setAirportPickupAssignment(AirportPickupAssignment airportPickupAssignment) {

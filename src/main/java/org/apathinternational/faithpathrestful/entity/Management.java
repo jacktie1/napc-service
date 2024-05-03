@@ -32,15 +32,19 @@ public class Management extends AuditableEntity {
     @Column(name = "announcement")
     private String announcement;
 
+    @Column(name = "week_of_welcome_start_date", nullable = false)
+    private LocalDate weekOfWelcomeStartDate;
+
     public Management() {
     }
 
-    public Management(Long id, Boolean doesAssignmentStart, LocalDate studentRegistrationStartDate, LocalDate studentRegistrationEndDate, String announcement) {
+    public Management(Long id, Boolean doesAssignmentStart, LocalDate studentRegistrationStartDate, LocalDate studentRegistrationEndDate, String announcement, LocalDate weekOfWelcomeStartDate) {
         this.id = id;
         this.doesAssignmentStart = doesAssignmentStart;
         this.studentRegistrationStartDate = studentRegistrationStartDate;
         this.studentRegistrationEndDate = studentRegistrationEndDate;
         this.announcement = announcement;
+        this.weekOfWelcomeStartDate = weekOfWelcomeStartDate;
     }
 
     public Long getId() {
@@ -83,6 +87,12 @@ public class Management extends AuditableEntity {
         this.announcement = announcement;
     }
 
+    public LocalDate getWeekOfWelcomeStartDate() {
+        return weekOfWelcomeStartDate;
+    }
 
+    public void setWeekOfWelcomeStartDate(LocalDate weekOfWelcomeStartDate) {
+        this.weekOfWelcomeStartDate = weekOfWelcomeStartDate;
+    }
     
 }

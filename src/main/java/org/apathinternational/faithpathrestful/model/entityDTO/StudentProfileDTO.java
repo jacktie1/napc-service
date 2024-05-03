@@ -44,6 +44,9 @@ public class StudentProfileDTO {
 
     private String usPhoneNumber;
 
+    @NotNull
+    private Boolean attendsWeekOfWelcome;
+
     public StudentProfileDTO() {
     }
 
@@ -68,6 +71,7 @@ public class StudentProfileDTO {
         this.wechatId = student.getWechatId();
         this.cnPhoneNumber = student.getCnPhoneNumber();
         this.usPhoneNumber = student.getUsPhoneNumber();
+        this.attendsWeekOfWelcome = student.getAttendsWeekOfWelcome();
     }
 
     // Getters and Setters
@@ -127,6 +131,10 @@ public class StudentProfileDTO {
         return usPhoneNumber;
     }
 
+    public Boolean getAttendsWeekOfWelcome() {
+        return attendsWeekOfWelcome;
+    }
+
     public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
@@ -181,6 +189,10 @@ public class StudentProfileDTO {
 
     public void setUsPhoneNumber(String usPhoneNumber) {
         this.usPhoneNumber = usPhoneNumber;
+    }
+
+    public void setAttendsWeekOfWelcome(Boolean attendsWeekOfWelcome) {
+        this.attendsWeekOfWelcome = attendsWeekOfWelcome;
     }
 
 }
