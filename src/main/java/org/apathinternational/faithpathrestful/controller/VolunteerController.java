@@ -143,6 +143,8 @@ public class VolunteerController {
         volunteerUser.setNumSingleBeds(volunteerTempHousing.getNumSingleBeds());
         volunteerUser.setGenderPreference(volunteerTempHousing.getGenderPreference());
         volunteerUser.setProvidesRide(volunteerTempHousing.getProvidesRide());
+        volunteerUser.setHasPet(volunteerTempHousing.getHasPet());
+        volunteerUser.setPetDescription(volunteerTempHousing.getPetDescription());
         volunteerUser.setTempHousingComment(volunteerTempHousing.getTempHousingComment());
 
         volunteerService.createVolunteer(volunteerUser);
@@ -516,6 +518,8 @@ public class VolunteerController {
         volunteer.setNumSingleBeds(VolunteerTempHousing.getNumSingleBeds());
         volunteer.setGenderPreference(VolunteerTempHousing.getGenderPreference());
         volunteer.setProvidesRide(VolunteerTempHousing.getProvidesRide());
+        volunteer.setHasPet(VolunteerTempHousing.getHasPet());
+        volunteer.setPetDescription(VolunteerTempHousing.getPetDescription());
         volunteer.setTempHousingComment(VolunteerTempHousing.getTempHousingComment());
 
         return ResponseHandler.generateResponse(new MessageReponse("TempHousing updated successfully."));

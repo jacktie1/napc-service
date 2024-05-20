@@ -92,6 +92,12 @@ public class Volunteer extends AuditableEntity {
     @Column(name = "provides_ride")
     private Boolean providesRide;
 
+    @Column(name = "has_pet")
+    private Boolean hasPet;
+
+    @Column(name = "pet_description")
+    private String petDescription;
+
     @Column(name = "temp_housing_comment")
     private String tempHousingComment;
 
@@ -195,6 +201,14 @@ public class Volunteer extends AuditableEntity {
         return providesRide;
     }
 
+    public Boolean getHasPet() {
+        return hasPet;
+    }
+
+    public String getPetDescription() {
+        return petDescription;
+    }
+
     public String getTempHousingComment() {
         return tempHousingComment;
     }
@@ -293,6 +307,14 @@ public class Volunteer extends AuditableEntity {
 
     public void setProvidesRide(Boolean providesRides) {
         this.providesRide = providesRides;
+    }
+
+    public void setHasPet(Boolean hasPet) {
+        this.hasPet = hasPet;
+    }
+
+    public void setPetDescription(String petDescription) {
+        this.petDescription = petDescription;
     }
 
     public void setTempHousingComment(String tempHousingComment) {

@@ -28,6 +28,10 @@ public class VolunteerTempHousingDTO {
 
     private Boolean providesRide;
 
+    private Boolean hasPet;
+
+    private String petDescription;
+
     private String tempHousingComment;
 
     public VolunteerTempHousingDTO() {
@@ -43,6 +47,8 @@ public class VolunteerTempHousingDTO {
         this.numSingleBeds = volunteer.getNumSingleBeds();
         this.genderPreference = volunteer.getGenderPreference();
         this.providesRide = volunteer.getProvidesRide();
+        this.hasPet = volunteer.getHasPet();
+        this.petDescription = volunteer.getPetDescription();
         this.tempHousingComment = volunteer.getTempHousingComment();
     }
 
@@ -80,6 +86,14 @@ public class VolunteerTempHousingDTO {
 
     public Boolean getProvidesRide() {
         return providesRide;
+    }
+
+    public Boolean getHasPet() {
+        return hasPet;
+    }
+
+    public String getPetDescription() {
+        return petDescription;
     }
 
     public String getTempHousingComment() {
@@ -120,6 +134,14 @@ public class VolunteerTempHousingDTO {
 
     public void setProvidesRides(Boolean providesRide) {
         this.providesRide = providesRide;
+    }
+
+    public void setHasPet(Boolean hasPet) {
+        this.hasPet = hasPet;
+    }
+
+    public void setPetDescription(String petDescription) {
+        this.petDescription = petDescription;
     }
 
     public void setTempHousingComment(String tempHousingComment) {
