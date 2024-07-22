@@ -5,3 +5,6 @@ CREATE TABLE IF NOT EXISTS `user_login` (
     UNIQUE(`user_id`),
     CONSTRAINT `fk_user_login_user_id` FOREIGN KEY (`user_id`) REFERENCES `user`(`user_id`)
 );
+
+ALTER TABLE `user_login` DROP FOREIGN KEY `fk_user_login_user_id`;
+ALTER TABLE `user_login` ADD CONSTRAINT `fk_user_login_user_id` FOREIGN KEY (`user_id`) REFERENCES `user`(`user_id`) ON DELETE CASCADE;
