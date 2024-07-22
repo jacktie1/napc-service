@@ -84,6 +84,8 @@ public class AuthController {
         
         // Check if user has security questions
         Boolean hasSecurityQuestions = authedUser.getSecurityQuestions() != null && authedUser.getSecurityQuestions().size() >= 3;
+
+        userService.saveUserLogin(authedUser);
     
         return ResponseHandler.generateResponse(new LoginSuccessResponse(token, userId, role, firstName, lastName, hasSecurityQuestions));
     }

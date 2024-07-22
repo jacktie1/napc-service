@@ -3,6 +3,7 @@ package org.apathinternational.faithpathrestful.model.entityDTO;
 import java.util.Date;
 
 import org.apathinternational.faithpathrestful.entity.Student;
+import org.apathinternational.faithpathrestful.entity.UserLogin;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -27,6 +28,9 @@ public class StudentDTO {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Date modifiedAt;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Date lastLoginTime;
 
     // Lazy fields
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -54,6 +58,12 @@ public class StudentDTO {
             this.modifiedAt = studentModifiedAt;
         } else {
             this.modifiedAt = userModifiedAt;
+        }
+
+        UserLogin userLogin = student.getUser().getUserLogin();
+
+        if (userLogin != null) {
+            this.lastLoginTime = userLogin.getLoginTime();
         }
     }
 
@@ -83,6 +93,10 @@ public class StudentDTO {
 
     public Date getModifiedAt() {
         return modifiedAt;
+    }
+
+    public Date getLastLoginTime() {
+        return lastLoginTime;
     }
 
     public AirportPickupAssignmentDTO getAirportPickupAssignment() {
@@ -170,8 +184,5 @@ public class StudentDTO {
             this.setTempHousingAssignment(emptyTempHousingAssignment);
         }
     }
-
-
-
 
 }

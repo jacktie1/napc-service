@@ -58,6 +58,9 @@ public class User extends AuditableEntity {
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private UserLogin userLogin;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     List<UserSecurityQuestion> securityQuestions;
 
@@ -110,6 +113,10 @@ public class User extends AuditableEntity {
         return lastName;
     }
 
+    public UserLogin getUserLogin() {
+        return userLogin;
+    }
+
     public List<UserSecurityQuestion> getSecurityQuestions() {
         return securityQuestions;
     }
@@ -156,6 +163,10 @@ public class User extends AuditableEntity {
 
     public void setLastName(String lastName) {
     	this.lastName = lastName;
+    }
+
+    public void setUserLogin(UserLogin userLogin) {
+        this.userLogin = userLogin;
     }
 
     public void setSecurityQuestions(List<UserSecurityQuestion> securityQuestions) {

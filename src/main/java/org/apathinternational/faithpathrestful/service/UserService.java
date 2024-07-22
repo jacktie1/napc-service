@@ -1,5 +1,6 @@
 package org.apathinternational.faithpathrestful.service;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,6 +9,7 @@ import java.util.Optional;
 import org.apathinternational.faithpathrestful.common.exception.ValidationException;
 import org.apathinternational.faithpathrestful.entity.Reference;
 import org.apathinternational.faithpathrestful.entity.User;
+import org.apathinternational.faithpathrestful.entity.UserLogin;
 import org.apathinternational.faithpathrestful.entity.UserSecurityQuestion;
 import org.apathinternational.faithpathrestful.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,6 +82,21 @@ public class UserService {
         }
 
         return userRepository.save(user);
+    }
+
+    public void saveUserLogin(User user) {
+        UserLogin userLogin = user.getUserLogin();
+
+        if(userLogin == null)
+        {
+            userLogin = new UserLogin();
+            userLogin.setUser(user);
+        }
+
+        userLogin.setLoginTime(new Date());
+
+        user.setUserLogin(userLogin);
+        userRepository.save(user);
     }
 
     public void deleteUsers(List<Long> userIds) {

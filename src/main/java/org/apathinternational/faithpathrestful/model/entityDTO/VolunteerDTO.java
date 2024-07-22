@@ -7,6 +7,7 @@ import java.util.List;
 import org.apathinternational.faithpathrestful.entity.AirportPickupAssignment;
 import org.apathinternational.faithpathrestful.entity.AirportPickupPreference;
 import org.apathinternational.faithpathrestful.entity.TempHousingAssignment;
+import org.apathinternational.faithpathrestful.entity.UserLogin;
 import org.apathinternational.faithpathrestful.entity.Volunteer;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -29,6 +30,9 @@ public class VolunteerDTO {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Date modifiedAt;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Date lastLoginTime;
 
     // Lazy fields
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -58,6 +62,12 @@ public class VolunteerDTO {
             this.modifiedAt = volunteerModifiedAt;
         } else {
             this.modifiedAt = userModifiedAt;
+        }
+
+        UserLogin userLogin = volunteer.getUser().getUserLogin();
+
+        if (userLogin != null) {
+            this.lastLoginTime = userLogin.getLoginTime();
         }
     }
 
@@ -180,5 +190,9 @@ public class VolunteerDTO {
 
     public Date getModifiedAt() {
         return modifiedAt;
+    }
+
+    public Date getLastLoginTime() {
+        return lastLoginTime;
     }
 }
