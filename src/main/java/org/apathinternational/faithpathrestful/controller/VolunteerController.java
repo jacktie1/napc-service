@@ -551,6 +551,16 @@ public class VolunteerController {
             newPreferredStudents.add(student);
         }
 
+        // keep the students that are already assigned to the volunteer
+        List<AirportPickupPreference> currentAirportPickupPreferences = volunteer.getAirportPickupPreferences();
+
+        for (AirportPickupPreference airportPickupPreference : currentAirportPickupPreferences) {
+            Student preferredStudent = airportPickupPreference.getStudent();
+            if(preferredStudent.getAirportPickupAssignment() != null && !newPreferredStudents.contains(preferredStudent)) {
+                newPreferredStudents.add(preferredStudent);
+            }
+        }
+
         volunteerService.updateAirportPickupPreferences(volunteer, newPreferredStudents);
         
         return ResponseHandler.generateResponse(new MessageReponse("Airport Pickup Preferences updated successfully."));
