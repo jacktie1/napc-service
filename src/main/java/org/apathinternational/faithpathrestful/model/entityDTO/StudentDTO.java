@@ -64,6 +64,8 @@ public class StudentDTO {
 
         if (userLogin != null) {
             this.lastLoginTime = userLogin.getLoginTime();
+        } else {
+            this.lastLoginTime = this.modifiedAt;
         }
     }
 
